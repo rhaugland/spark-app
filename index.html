@@ -6,667 +6,534 @@
 <title>Spark</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  :root{
+    --bg:#0a0a0a;--surface:#161616;--surface2:#1e1e1e;--border:#2a2a2a;
+    --text:#f0f0f0;--text2:#888;--accent:#ff6b35;--accent2:#ff9f1c;
+    --green:#2ec4b6;--blue:#4ea8de;--purple:#b07cd8;--red:#ef4444;--radius:16px;
+  }
+  body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100dvh;overflow-x:hidden}
 
-  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  /* Top bar */
+  .top-bar{position:fixed;top:0;left:0;right:0;z-index:100;padding:12px 20px;
+    padding-top:max(12px,env(safe-area-inset-top));
+    background:rgba(10,10,10,0.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+    border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+  .top-bar h1{font-size:22px;font-weight:700;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  .top-bar .friend-count{font-size:11px;color:var(--text2);background:var(--surface2);
+    padding:4px 10px;border-radius:12px;border:1px solid var(--border)}
 
-  :root {
-    --bg: #0a0a0a;
-    --surface: #161616;
-    --surface2: #1e1e1e;
-    --border: #2a2a2a;
-    --text: #f0f0f0;
-    --text2: #888;
-    --accent: #ff6b35;
-    --accent2: #ff9f1c;
-    --green: #2ec4b6;
-    --blue: #4ea8de;
-    --purple: #b07cd8;
-    --radius: 16px;
-  }
+  /* Tab bar */
+  .tab-bar{position:fixed;bottom:0;left:0;right:0;z-index:100;display:flex;padding:8px 12px;
+    padding-bottom:max(8px,env(safe-area-inset-bottom));
+    background:rgba(10,10,10,0.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+    border-top:1px solid var(--border);gap:4px}
+  .tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;
+    padding:8px 4px;border-radius:12px;background:none;border:none;color:var(--text2);
+    font-size:10px;font-weight:500;cursor:pointer;transition:all 0.2s}
+  .tab.active{color:var(--accent);background:rgba(255,107,53,0.1)}
+  .tab svg{width:22px;height:22px}
 
-  body {
-    font-family: 'Inter', -apple-system, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100dvh;
-    overflow-x: hidden;
-  }
+  .content{padding-top:60px;padding-bottom:90px;min-height:100dvh}
+  .view{display:none;padding:16px}
+  .view.active{display:block}
 
-  .top-bar {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-    padding: 12px 20px;
-    padding-top: max(12px, env(safe-area-inset-top));
-    background: rgba(10,10,10,0.85);
-    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--border);
-  }
-  .top-bar h1 {
-    font-size: 22px; font-weight: 700;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  }
-  .top-bar p { font-size: 11px; color: var(--text2); margin-top: 2px; }
+  .section-label{font-size:11px;font-weight:600;text-transform:uppercase;
+    letter-spacing:1.2px;color:var(--text2);margin:20px 0 12px;padding-left:4px}
+  .section-label:first-child{margin-top:4px}
 
-  .tab-bar {
-    position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
-    display: flex; padding: 8px 12px;
-    padding-bottom: max(8px, env(safe-area-inset-bottom));
-    background: rgba(10,10,10,0.92);
-    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-    border-top: 1px solid var(--border); gap: 4px;
-  }
-  .tab {
-    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;
-    padding: 8px 4px; border-radius: 12px;
-    background: none; border: none; color: var(--text2);
-    font-size: 10px; font-weight: 500; cursor: pointer; transition: all 0.2s;
-  }
-  .tab.active { color: var(--accent); background: rgba(255,107,53,0.1); }
-  .tab svg { width: 22px; height: 22px; }
+  /* ===== FRIENDS TAB ===== */
+  .add-friend-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--accent),var(--accent2));
+    border:none;border-radius:12px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;gap:8px;transition:all 0.15s;margin-bottom:16px}
+  .add-friend-btn:active{transform:scale(0.97);opacity:0.9}
+  .add-friend-btn:disabled{opacity:0.4;pointer-events:none}
+  .add-friend-btn svg{width:18px;height:18px}
 
-  .content { padding-top: 72px; padding-bottom: 90px; min-height: 100dvh; }
-  .view { display: none; padding: 16px; }
-  .view.active { display: block; }
+  .friend-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+    padding:16px;margin-bottom:10px;transition:transform 0.15s}
+  .friend-card:active{transform:scale(0.98)}
+  .friend-top{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+  .friend-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;
+    justify-content:center;font-size:18px;font-weight:700;flex-shrink:0}
+  .friend-info{flex:1}
+  .friend-info h3{font-size:15px;font-weight:600}
+  .friend-info p{font-size:12px;color:var(--text2);margin-top:2px}
+  .friend-remove{width:28px;height:28px;border-radius:50%;background:none;border:1px solid var(--border);
+    color:var(--text2);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+  .friend-remove:active{background:var(--red);color:#fff;border-color:var(--red)}
 
-  .section-label {
-    font-size: 11px; font-weight: 600; text-transform: uppercase;
-    letter-spacing: 1.2px; color: var(--text2); margin: 20px 0 12px; padding-left: 4px;
-  }
-  .section-label:first-child { margin-top: 4px; }
+  .interest-tags{display:flex;flex-wrap:wrap;gap:6px}
+  .interest-pill{padding:5px 10px;border-radius:14px;font-size:11px;font-weight:500;
+    background:var(--surface2);border:1px solid var(--border);color:var(--text2)}
+  .interest-pill.active{background:rgba(255,107,53,0.12);border-color:var(--accent);color:var(--accent)}
 
-  .moment-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 16px; margin-bottom: 12px;
-    transition: transform 0.15s;
-  }
-  .moment-card:active { transform: scale(0.98); }
-  .moment-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
-  .moment-avatar {
-    width: 42px; height: 42px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px; font-weight: 700; flex-shrink: 0;
-  }
-  .moment-meta h3 { font-size: 15px; font-weight: 600; }
-  .moment-meta p { font-size: 12px; color: var(--text2); margin-top: 2px; }
-  .moment-context {
-    background: var(--surface2); border-radius: 12px; padding: 14px;
-    margin-bottom: 12px; font-size: 13px; line-height: 1.5;
-  }
+  .empty-state{text-align:center;padding:60px 20px}
+  .empty-state .icon{font-size:48px;margin-bottom:16px;opacity:0.3}
+  .empty-state h3{font-size:18px;font-weight:600;margin-bottom:8px}
+  .empty-state p{font-size:13px;color:var(--text2);line-height:1.5}
 
-  .moment-gif {
-    width: 100%; border-radius: 12px; overflow: hidden;
-    margin-bottom: 12px; position: relative;
-  }
-  .moment-gif canvas {
-    width: 100%; display: block; border-radius: 12px;
-  }
-  .moment-gif .gif-label {
-    position: absolute; bottom: 8px; right: 8px;
-    background: rgba(0,0,0,0.7); color: #fff;
-    font-size: 10px; font-weight: 600;
-    padding: 4px 8px; border-radius: 6px;
-    text-transform: uppercase; letter-spacing: 0.5px;
-  }
+  /* ===== FEED TAB ===== */
+  .event-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+    margin-bottom:12px;overflow:hidden}
+  .event-top{padding:14px 16px;display:flex;align-items:center;gap:12px}
+  .event-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;
+    justify-content:center;font-size:18px;flex-shrink:0}
+  .event-info{flex:1}
+  .event-info h3{font-size:14px;font-weight:600}
+  .event-info p{font-size:12px;color:var(--text2);margin-top:2px}
+  .event-time{font-size:10px;color:var(--text2);white-space:nowrap}
+  .event-match{padding:0 16px 12px;display:flex;align-items:center;gap:8px}
+  .event-match-label{font-size:11px;color:var(--text2)}
+  .match-avatars{display:flex;gap:-4px}
+  .match-avatar{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;
+    justify-content:center;font-size:10px;font-weight:700;margin-left:-6px;
+    border:2px solid var(--surface)}
+  .match-avatar:first-child{margin-left:0}
 
-  .send-btn {
-    width: 100%; padding: 14px;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    border: none; border-radius: 12px;
-    color: #fff; font-size: 14px; font-weight: 600;
-    cursor: pointer; transition: all 0.15s;
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-  }
-  .send-btn:active { transform: scale(0.97); opacity: 0.9; }
-  .send-btn svg { width: 16px; height: 16px; }
+  .event-preview{width:100%;aspect-ratio:16/10;position:relative;background:var(--surface2)}
+  .event-preview canvas{width:100%;height:100%;display:block}
+  .event-preview .preview-overlay{position:absolute;inset:0;display:flex;align-items:center;
+    justify-content:center;background:rgba(0,0,0,0.4);opacity:1;transition:opacity 0.3s}
+  .event-preview .preview-overlay.generated{opacity:0;pointer-events:none}
 
-  .ticker {
-    display: flex; gap: 10px; overflow-x: auto;
-    padding-bottom: 4px; margin-bottom: 8px; scrollbar-width: none;
-  }
-  .ticker::-webkit-scrollbar { display: none; }
-  .ticker-item {
-    flex-shrink: 0; background: var(--surface); border: 1px solid var(--border);
-    border-radius: 12px; padding: 10px 14px; font-size: 12px;
-    display: flex; align-items: center; gap: 8px;
-  }
-  .ticker-item .live-dot {
-    width: 6px; height: 6px; border-radius: 50%; background: #ef4444;
-    animation: pulse 1.5s infinite;
-  }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  .create-btn{width:calc(100% - 32px);margin:0 16px 16px;padding:13px;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    border:none;border-radius:12px;color:#fff;font-size:14px;font-weight:600;
+    cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all 0.15s}
+  .create-btn:active{transform:scale(0.97);opacity:0.9}
+  .create-btn.created{background:var(--green)}
+  .create-btn svg{width:16px;height:16px}
 
-  /* Jokes tab */
-  .memory-upload {
-    border: 2px dashed var(--border); border-radius: var(--radius);
-    padding: 32px 16px; text-align: center; margin-bottom: 16px;
-    cursor: pointer; transition: border-color 0.2s;
-  }
-  .memory-upload:active { border-color: var(--accent); }
-  .memory-upload svg { width: 32px; height: 32px; color: var(--text2); margin-bottom: 8px; }
-  .memory-upload p { font-size: 13px; color: var(--text2); }
-  .memory-upload .highlight { color: var(--accent); font-weight: 600; }
+  .send-row{display:flex;gap:8px;padding:0 16px 14px}
+  .send-row .send-to{flex:1;padding:10px;background:var(--surface2);border:1px solid var(--border);
+    border-radius:10px;font-size:12px;font-weight:500;color:var(--text);cursor:pointer;
+    text-align:center;transition:all 0.15s;display:none}
+  .send-row .send-to:active{background:var(--accent);border-color:var(--accent)}
+  .send-row.visible .send-to{display:block}
 
-  .joke-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); overflow: hidden; margin-bottom: 12px;
-  }
-  .joke-image { width: 100%; position: relative; overflow: hidden; }
-  .joke-image canvas { width: 100%; display: block; }
+  /* ===== MODAL ===== */
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:300;
+    display:flex;align-items:flex-end;justify-content:center}
+  .modal-overlay.hidden{display:none}
+  .modal{background:var(--surface);border-radius:24px 24px 0 0;padding:24px 20px;
+    padding-bottom:max(24px,env(safe-area-inset-bottom));width:100%;max-width:420px;
+    max-height:85dvh;overflow-y:auto}
+  .modal h2{font-size:20px;font-weight:700;margin-bottom:4px}
+  .modal .subtitle{font-size:13px;color:var(--text2);margin-bottom:20px;line-height:1.5}
 
-  .joke-footer {
-    padding: 12px 16px; display: flex; align-items: center; justify-content: space-between;
-  }
-  .joke-footer .context { font-size: 12px; color: var(--text2); }
-  .joke-actions { display: flex; gap: 8px; }
-  .joke-action-btn {
-    width: 36px; height: 36px; border-radius: 50%;
-    background: var(--surface2); border: 1px solid var(--border);
-    color: var(--text2); display: flex; align-items: center; justify-content: center;
-    cursor: pointer; transition: all 0.15s;
-  }
-  .joke-action-btn:active { background: var(--accent); color: #fff; border-color: var(--accent); }
-  .joke-action-btn svg { width: 16px; height: 16px; }
+  .input-group{margin-bottom:14px}
+  .input-group label{font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;
+    letter-spacing:0.5px;display:block;margin-bottom:6px}
+  .input-group input{width:100%;padding:12px 14px;background:var(--surface2);
+    border:1px solid var(--border);border-radius:12px;color:var(--text);font-size:14px;
+    font-family:inherit;outline:none;transition:border-color 0.2s}
+  .input-group input:focus{border-color:var(--accent)}
 
-  .friend-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
-  .friend-tag {
-    padding: 8px 14px; border-radius: 20px; font-size: 13px; font-weight: 500;
-    border: 1px solid var(--border); background: var(--surface);
-    color: var(--text2); cursor: pointer; transition: all 0.15s;
-  }
-  .friend-tag.selected { background: rgba(255,107,53,0.15); border-color: var(--accent); color: var(--accent); }
+  .interest-picker{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+  .interest-pick{padding:8px 14px;border-radius:20px;font-size:13px;font-weight:500;
+    border:1px solid var(--border);background:var(--surface2);color:var(--text2);
+    cursor:pointer;transition:all 0.15s}
+  .interest-pick.selected{background:rgba(255,107,53,0.15);border-color:var(--accent);color:var(--accent)}
 
-  /* Nudges */
-  .nudge-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
-  .nudge-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 0; cursor: pointer;
-    transition: all 0.15s; position: relative; overflow: hidden;
-  }
-  .nudge-card:active { transform: scale(0.96); }
-  .nudge-thumb { width: 100%; height: 90px; overflow: hidden; }
-  .nudge-thumb canvas { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .nudge-body { padding: 12px 14px; }
-  .nudge-card .nudge-to {
-    font-size: 11px; color: var(--text2); margin-bottom: 4px;
-    display: flex; align-items: center; gap: 4px;
-  }
-  .nudge-card .nudge-to .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-  .nudge-card .nudge-msg { font-size: 13px; font-weight: 500; line-height: 1.4; }
-  .nudge-card .nudge-reason { font-size: 11px; color: var(--text2); margin-top: 6px; font-style: italic; }
-  .nudge-card.sent { opacity: 0.5; }
-  .nudge-card.sent::after {
-    content: 'Sent'; position: absolute; top: 10px; right: 10px;
-    font-size: 10px; font-weight: 600; color: var(--green);
-    background: rgba(46,196,182,0.15); padding: 3px 8px; border-radius: 6px;
-  }
+  .modal-btn{width:100%;padding:14px;border:none;border-radius:12px;font-size:15px;
+    font-weight:600;cursor:pointer;transition:all 0.15s}
+  .modal-btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
+  .modal-btn.secondary{background:var(--surface2);color:var(--text);margin-top:8px}
+  .modal-btn:active{transform:scale(0.97)}
 
-  .streak-bar {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 16px; margin-bottom: 16px;
-    display: flex; align-items: center; gap: 14px;
-  }
-  .streak-ring {
-    width: 52px; height: 52px; border-radius: 50%; border: 3px solid var(--border);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px; font-weight: 700; flex-shrink: 0;
-  }
-  .streak-ring.hot { border-color: var(--accent); color: var(--accent); }
-  .streak-info h3 { font-size: 14px; font-weight: 600; }
-  .streak-info p { font-size: 12px; color: var(--text2); margin-top: 2px; }
+  .or-divider{text-align:center;color:var(--text2);font-size:12px;margin:12px 0;position:relative}
+  .or-divider::before,.or-divider::after{content:'';position:absolute;top:50%;width:40%;height:1px;background:var(--border)}
+  .or-divider::before{left:0}
+  .or-divider::after{right:0}
 
-  .friend-row {
-    display: flex; align-items: center; gap: 12px;
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 14px 16px; margin-bottom: 8px;
-  }
-  .friend-row .fr-avatar {
-    width: 38px; height: 38px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 14px; font-weight: 700; flex-shrink: 0;
-  }
-  .friend-row .fr-info { flex: 1; }
-  .friend-row .fr-info h4 { font-size: 14px; font-weight: 500; }
-  .friend-row .fr-info p { font-size: 11px; color: var(--text2); margin-top: 2px; }
-  .friend-row .fr-days { font-size: 20px; font-weight: 700; color: var(--text2); }
-  .friend-row .fr-days.warn { color: var(--accent); }
-  .friend-row .fr-days.danger { color: #ef4444; }
+  .contact-btn{width:100%;padding:14px;background:var(--surface2);border:1px solid var(--border);
+    border-radius:12px;color:var(--text);font-size:14px;font-weight:500;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:8px;transition:all 0.15s}
+  .contact-btn:active{border-color:var(--accent)}
+  .contact-btn svg{width:18px;height:18px;color:var(--accent)}
 
-  .toast {
-    position: fixed; top: 50%; left: 50%;
-    transform: translate(-50%, -50%) scale(0.8);
-    background: rgba(0,0,0,0.9); color: #fff; padding: 16px 28px;
-    border-radius: 16px; font-size: 15px; font-weight: 600;
-    z-index: 200; opacity: 0; pointer-events: none;
-    transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    text-align: center;
-  }
-  .toast.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  /* Toast */
+  .toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.8);
+    background:rgba(0,0,0,0.9);color:#fff;padding:16px 28px;border-radius:16px;
+    font-size:15px;font-weight:600;z-index:200;opacity:0;pointer-events:none;
+    transition:all 0.25s cubic-bezier(0.175,0.885,0.32,1.275);text-align:center}
+  .toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
 
-  .modal-overlay {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.8);
-    z-index: 300; display: flex; align-items: flex-end; justify-content: center;
-  }
-  .modal-overlay.hidden { display: none; }
-  .modal {
-    background: var(--surface); border-radius: 24px 24px 0 0;
-    padding: 28px 20px; padding-bottom: max(28px, env(safe-area-inset-bottom));
-    width: 100%; max-width: 420px; max-height: 85dvh; overflow-y: auto;
-  }
-  .modal h2 { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
-  .modal .subtitle { font-size: 13px; color: var(--text2); margin-bottom: 20px; line-height: 1.5; }
-  .input-group { margin-bottom: 16px; }
-  .input-group label {
-    font-size: 12px; font-weight: 600; color: var(--text2);
-    text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;
-  }
-  .input-group input, .input-group textarea {
-    width: 100%; padding: 12px 14px; background: var(--surface2);
-    border: 1px solid var(--border); border-radius: 12px;
-    color: var(--text); font-size: 14px; font-family: inherit; outline: none;
-    transition: border-color 0.2s;
-  }
-  .input-group input:focus, .input-group textarea:focus { border-color: var(--accent); }
-  .input-group textarea { resize: none; min-height: 60px; }
-  .modal-btn {
-    width: 100%; padding: 14px; border: none; border-radius: 12px;
-    font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.15s;
-  }
-  .modal-btn.primary { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; }
-  .modal-btn.secondary { background: var(--surface2); color: var(--text); margin-top: 8px; }
+  /* Generating spinner */
+  .generating{display:flex;align-items:center;gap:8px}
+  .spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);
+    border-top-color:#fff;border-radius:50%;animation:spin 0.6s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
 
-  @keyframes slideUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
-  .animate-in { animation: slideUp 0.35s ease-out both; }
-  .delay-1{animation-delay:.05s} .delay-2{animation-delay:.1s} .delay-3{animation-delay:.15s}
-  .delay-4{animation-delay:.2s} .delay-5{animation-delay:.25s}
+  @keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+  .animate-in{animation:slideUp 0.35s ease-out both}
+  .delay-1{animation-delay:.05s}.delay-2{animation-delay:.1s}.delay-3{animation-delay:.15s}
+  .delay-4{animation-delay:.2s}.delay-5{animation-delay:.25s}
 </style>
 </head>
 <body>
 
 <div class="top-bar">
   <h1>Spark</h1>
-  <p>3 friends need a text today</p>
+  <div class="friend-count" id="friendCount">0 / 15 friends</div>
 </div>
 
 <div class="toast" id="toast"></div>
 
+<!-- Add Friend Modal -->
 <div class="modal-overlay hidden" id="addModal">
   <div class="modal">
     <h2>Add a friend</h2>
-    <p class="subtitle">Tell Spark about them so it can find the right moments to reach out.</p>
-    <div class="input-group"><label>Name</label><input type="text" id="friendName" placeholder="Dave"></div>
-    <div class="input-group"><label>Phone (optional)</label><input type="tel" id="friendPhone" placeholder="+1 555 123 4567"></div>
-    <div class="input-group"><label>What are they into?</label><textarea id="friendInterests" placeholder="Bears fan, loves craft beer, just got a new dog..."></textarea></div>
-    <div class="input-group"><label>Inside jokes / shared memories</label><textarea id="friendMemories" placeholder="That time we got lost in Wisconsin, the 'legendary' poker hand..."></textarea></div>
-    <button class="modal-btn primary" onclick="addFriend()">Add Friend</button>
+    <p class="subtitle">Pick from contacts or add manually. Tell Spark what matters to them.</p>
+
+    <button class="contact-btn" onclick="pickContact()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Import from Contacts
+    </button>
+    <div class="or-divider">or add manually</div>
+
+    <div class="input-group"><label>Name</label><input type="text" id="inp-name" placeholder="Dave"></div>
+    <div class="input-group"><label>Phone</label><input type="tel" id="inp-phone" placeholder="+1 555 123 4567"></div>
+    <div class="input-group"><label>Birthday</label><input type="date" id="inp-bday"></div>
+
+    <label style="font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:8px">What do they care about?</label>
+    <div class="interest-picker" id="interestPicker"></div>
+
+    <div class="input-group"><label>Custom interest</label><input type="text" id="inp-custom" placeholder="e.g. Chicago Bears, woodworking..."></div>
+
+    <button class="modal-btn primary" onclick="saveFriend()">Add Friend</button>
     <button class="modal-btn secondary" onclick="closeModal()">Cancel</button>
   </div>
 </div>
 
 <div class="content">
 
-  <!-- TAB 1: Contextual Ammo -->
-  <div class="view active" id="view-ammo">
-    <div class="section-label">Live moments</div>
-    <div class="ticker animate-in">
-      <div class="ticker-item"><div class="live-dot"></div> Bears 17 - Packers 24 &middot; Final</div>
-      <div class="ticker-item">NFL Week 4 &middot; Sun</div>
-      <div class="ticker-item">MLB Playoffs &middot; Starting</div>
-      <div class="ticker-item">New bourbon release &middot; Buffalo Trace</div>
-    </div>
-
-    <div class="section-label">Ready to send</div>
-
-    <div class="moment-card animate-in delay-1">
-      <div class="moment-header">
-        <div class="moment-avatar" style="background:rgba(255,107,53,0.15);color:var(--accent);">D</div>
-        <div class="moment-meta"><h3>Dave</h3><p>Bears fan &middot; Last texted 5 days ago</p></div>
-      </div>
-      <div class="moment-context">Bears lost to the Packers again (17-24). Dave's probably fuming. Perfect time to twist the knife.</div>
-      <div class="moment-gif">
-        <canvas id="gif-bears" width="640" height="400"></canvas>
-        <div class="gif-label">Custom GIF</div>
-      </div>
-      <button class="send-btn" onclick="sendAmmo('Dave','Bears L')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
-        Send to Dave via iMessage
-      </button>
-    </div>
-
-    <div class="moment-card animate-in delay-2">
-      <div class="moment-header">
-        <div class="moment-avatar" style="background:rgba(78,168,222,0.15);color:var(--blue);">M</div>
-        <div class="moment-meta"><h3>Mike</h3><p>Bourbon guy &middot; Last texted 12 days ago</p></div>
-      </div>
-      <div class="moment-context">Buffalo Trace dropped a limited single barrel today. Mike hunts these. He either already knows or needs to hear about it from you first.</div>
-      <div class="moment-gif">
-        <canvas id="gif-bourbon" width="640" height="400"></canvas>
-        <div class="gif-label">Custom GIF</div>
-      </div>
-      <button class="send-btn" onclick="sendAmmo('Mike','bourbon drop')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
-        Send to Mike via iMessage
-      </button>
-    </div>
-
-    <div class="moment-card animate-in delay-3">
-      <div class="moment-header">
-        <div class="moment-avatar" style="background:rgba(176,124,216,0.15);color:var(--purple);">J</div>
-        <div class="moment-meta"><h3>Jake</h3><p>New dad &middot; Last texted 21 days ago</p></div>
-      </div>
-      <div class="moment-context">Jake's kid had their first soccer game yesterday (Saturday league). Ask how it went -- he'll love that you remembered.</div>
-      <div class="moment-gif">
-        <canvas id="gif-soccer" width="640" height="400"></canvas>
-        <div class="gif-label">Custom GIF</div>
-      </div>
-      <button class="send-btn" onclick="sendAmmo('Jake','soccer game')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
-        Send to Jake via iMessage
-      </button>
+  <!-- FRIENDS TAB -->
+  <div class="view active" id="view-friends">
+    <button class="add-friend-btn" id="addBtn" onclick="openModal()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+      Add Friend
+    </button>
+    <div id="friendList"></div>
+    <div class="empty-state" id="emptyFriends">
+      <div class="icon">&#x1F465;</div>
+      <h3>No friends yet</h3>
+      <p>Add up to 15 close friends and tag what matters to them. Spark will watch for moments worth reaching out about.</p>
     </div>
   </div>
 
-  <!-- TAB 2: Inside Jokes -->
-  <div class="view" id="view-jokes">
-    <div class="section-label">Your crew</div>
-    <div class="friend-tags">
-      <div class="friend-tag selected" onclick="toggleTag(this)">Dave</div>
-      <div class="friend-tag" onclick="toggleTag(this)">Mike</div>
-      <div class="friend-tag" onclick="toggleTag(this)">Jake</div>
-      <div class="friend-tag" onclick="toggleTag(this)">Group chat</div>
-    </div>
-    <div class="memory-upload" onclick="document.getElementById('photoInput').click()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-      <p>Drop photos & memories here<br><span class="highlight">Spark turns them into sendable content</span></p>
-      <input type="file" id="photoInput" accept="image/*" multiple hidden>
-    </div>
-
-    <div class="section-label">Generated from your memories</div>
-
-    <div class="joke-card animate-in delay-1">
-      <div class="joke-image"><canvas id="meme-wisconsin" width="640" height="640"></canvas></div>
-      <div class="joke-footer">
-        <span class="context">From: "got lost in WI" memory</span>
-        <div class="joke-actions">
-          <button class="joke-action-btn" onclick="refreshJoke(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15"/></svg></button>
-          <button class="joke-action-btn" onclick="sendJoke('Dave','Wisconsin')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></button>
-        </div>
-      </div>
-    </div>
-
-    <div class="joke-card animate-in delay-2">
-      <div class="joke-image"><canvas id="meme-poker" width="640" height="640"></canvas></div>
-      <div class="joke-footer">
-        <span class="context">From: "legendary poker hand"</span>
-        <div class="joke-actions">
-          <button class="joke-action-btn" onclick="refreshJoke(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15"/></svg></button>
-          <button class="joke-action-btn" onclick="sendJoke('Mike','poker')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></button>
-        </div>
-      </div>
-    </div>
-
-    <div class="joke-card animate-in delay-3">
-      <div class="joke-image"><canvas id="meme-pizza" width="640" height="640"></canvas></div>
-      <div class="joke-footer">
-        <span class="context">From: group memory</span>
-        <div class="joke-actions">
-          <button class="joke-action-btn" onclick="refreshJoke(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15"/></svg></button>
-          <button class="joke-action-btn" onclick="sendJoke('Group','pizza')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- TAB 3: Nudges -->
-  <div class="view" id="view-nudges">
-    <div class="streak-bar animate-in">
-      <div class="streak-ring hot">7</div>
-      <div class="streak-info"><h3>7-day streak</h3><p>You've reached out to someone every day this week</p></div>
-    </div>
-
-    <div class="section-label">One-tap sends</div>
-    <div class="nudge-grid">
-      <div class="nudge-card animate-in delay-1" onclick="sendNudge(this,'Dave')">
-        <div class="nudge-thumb"><canvas id="nudge-bears" width="320" height="180"></canvas></div>
-        <div class="nudge-body">
-          <div class="nudge-to"><div class="dot" style="background:var(--accent);"></div> Dave</div>
-          <div class="nudge-msg">"That 4th quarter was criminal"</div>
-          <div class="nudge-reason">Bears lost today</div>
-        </div>
-      </div>
-      <div class="nudge-card animate-in delay-2" onclick="sendNudge(this,'Mike')">
-        <div class="nudge-thumb"><canvas id="nudge-bourbon" width="320" height="180"></canvas></div>
-        <div class="nudge-body">
-          <div class="nudge-to"><div class="dot" style="background:var(--blue);"></div> Mike</div>
-          <div class="nudge-msg">"Buffalo Trace single barrel just dropped"</div>
-          <div class="nudge-reason">New release today</div>
-        </div>
-      </div>
-      <div class="nudge-card animate-in delay-3" onclick="sendNudge(this,'Jake')">
-        <div class="nudge-thumb"><canvas id="nudge-soccer" width="320" height="180"></canvas></div>
-        <div class="nudge-body">
-          <div class="nudge-to"><div class="dot" style="background:var(--purple);"></div> Jake</div>
-          <div class="nudge-msg">"How'd the little man do yesterday?"</div>
-          <div class="nudge-reason">Kid's first soccer game</div>
-        </div>
-      </div>
-      <div class="nudge-card sent animate-in delay-4">
-        <div class="nudge-thumb"><canvas id="nudge-bday" width="320" height="180"></canvas></div>
-        <div class="nudge-body">
-          <div class="nudge-to"><div class="dot" style="background:var(--green);"></div> Sam</div>
-          <div class="nudge-msg">"Happy birthday dude, beers soon?"</div>
-          <div class="nudge-reason">Birthday was yesterday</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="section-label">Days since last text</div>
-    <div class="friend-row animate-in delay-2">
-      <div class="fr-avatar" style="background:rgba(255,107,53,0.15);color:var(--accent);">D</div>
-      <div class="fr-info"><h4>Dave</h4><p>Bears, golf, dad jokes</p></div>
-      <div class="fr-days">5</div>
-    </div>
-    <div class="friend-row animate-in delay-3">
-      <div class="fr-avatar" style="background:rgba(78,168,222,0.15);color:var(--blue);">M</div>
-      <div class="fr-info"><h4>Mike</h4><p>Bourbon, poker, fishing</p></div>
-      <div class="fr-days warn">12</div>
-    </div>
-    <div class="friend-row animate-in delay-4">
-      <div class="fr-avatar" style="background:rgba(176,124,216,0.15);color:var(--purple);">J</div>
-      <div class="fr-info"><h4>Jake</h4><p>New dad, soccer, BBQ</p></div>
-      <div class="fr-days danger">21</div>
-    </div>
-    <div class="friend-row animate-in delay-5">
-      <div class="fr-avatar" style="background:rgba(46,196,182,0.15);color:var(--green);">S</div>
-      <div class="fr-info"><h4>Sam</h4><p>Music, hiking, movies</p></div>
-      <div class="fr-days">1</div>
-    </div>
-    <div style="margin-top:20px;">
-      <button class="send-btn" onclick="openModal()" style="background:var(--surface2);border:1px solid var(--border);">+ Add a friend</button>
+  <!-- FEED TAB -->
+  <div class="view" id="view-feed">
+    <div id="feedList"></div>
+    <div class="empty-state" id="emptyFeed">
+      <div class="icon">&#x26A1;</div>
+      <h3>No events yet</h3>
+      <p>Add friends and their interests first. Spark will match events to your friends automatically.</p>
     </div>
   </div>
 
 </div>
 
 <div class="tab-bar">
-  <button class="tab active" onclick="switchTab('ammo',this)">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>Ammo
+  <button class="tab active" onclick="switchTab('friends',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+    Friends
   </button>
-  <button class="tab" onclick="switchTab('jokes',this)">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>Jokes
-  </button>
-  <button class="tab" onclick="switchTab('nudges',this)">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>Nudges
+  <button class="tab" onclick="switchTab('feed',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+    Feed
   </button>
 </div>
 
 <script>
-// ======== CANVAS DRAWING ENGINE ========
+// ===== DATA =====
+const INTERESTS = [
+  {id:'nfl', label:'NFL', icon:'football', color:'#8B4513'},
+  {id:'nba', label:'NBA', icon:'basketball', color:'#ff6b35'},
+  {id:'mlb', label:'MLB', icon:'baseball', color:'#2d6a2e'},
+  {id:'nhl', label:'NHL', icon:'hockey', color:'#4ea8de'},
+  {id:'golf', label:'Golf', icon:'golf', color:'#2d8c3e'},
+  {id:'soccer', label:'Soccer', icon:'soccer', color:'#b07cd8'},
+  {id:'bourbon', label:'Bourbon', icon:'bourbon', color:'#8B4513'},
+  {id:'beer', label:'Craft Beer', icon:'beer', color:'#daa520'},
+  {id:'wine', label:'Wine', icon:'wine', color:'#722f37'},
+  {id:'coffee', label:'Coffee', icon:'coffee', color:'#3e2723'},
+  {id:'gaming', label:'Gaming', icon:'gaming', color:'#7c3aed'},
+  {id:'music', label:'Music', icon:'music', color:'#ec4899'},
+  {id:'movies', label:'Movies', icon:'movies', color:'#f59e0b'},
+  {id:'fitness', label:'Fitness', icon:'fitness', color:'#10b981'},
+  {id:'cooking', label:'Cooking', icon:'cooking', color:'#ef4444'},
+  {id:'travel', label:'Travel', icon:'travel', color:'#06b6d4'},
+  {id:'crypto', label:'Crypto', icon:'crypto', color:'#f7931a'},
+  {id:'stocks', label:'Stocks', icon:'stocks', color:'#22c55e'},
+  {id:'fishing', label:'Fishing', icon:'fishing', color:'#4ea8de'},
+  {id:'hiking', label:'Hiking', icon:'hiking', color:'#65a30d'},
+  {id:'cars', label:'Cars', icon:'cars', color:'#ef4444'},
+  {id:'mma', label:'MMA/UFC', icon:'mma', color:'#dc2626'},
+];
 
-function drawBearsGif(canvasId, large) {
-  const c = document.getElementById(canvasId);
-  if (!c) return;
-  const ctx = c.getContext('2d');
-  const W = c.width, H = c.height;
+// Simulated event sources — in production these would be real APIs
+const EVENT_SOURCES = [
+  {interests:['nfl'], title:'Bears lose to Packers 17-24', detail:'Chicago Bears fall again in NFC North rivalry', time:'2h ago', type:'sports'},
+  {interests:['nfl'], title:'Chiefs defeat Ravens 31-20', detail:'Mahomes throws 4 TDs in dominant performance', time:'3h ago', type:'sports'},
+  {interests:['bourbon'], title:'Buffalo Trace Single Barrel Select drops', detail:'Limited release hitting shelves today', time:'4h ago', type:'release'},
+  {interests:['golf'], title:'Ryder Cup Day 2 results', detail:'USA trails Europe 6.5 to 9.5 heading into singles', time:'1h ago', type:'sports'},
+  {interests:['nba'], title:'NBA preseason tips off', detail:'First preseason games start this week', time:'6h ago', type:'sports'},
+  {interests:['beer'], title:'Goose Island BCBS variants announced', detail:'2026 Bourbon County lineup revealed: 5 variants', time:'5h ago', type:'release'},
+  {interests:['mlb'], title:'MLB Playoff bracket set', detail:'Wild card series begins Tuesday', time:'8h ago', type:'sports'},
+  {interests:['crypto'], title:'Bitcoin breaks $95K', detail:'New ATH amid ETF inflow surge', time:'30m ago', type:'market'},
+  {interests:['stocks'], title:'NVDA up 8% after earnings beat', detail:'Revenue guidance crushes estimates', time:'1h ago', type:'market'},
+  {interests:['music'], title:'Kendrick drops surprise album', detail:'New album "Spirit Level" available now', time:'2h ago', type:'release'},
+  {interests:['mma'], title:'UFC 310 results', detail:'Main event ends in shocking KO in round 1', time:'4h ago', type:'sports'},
+  {interests:['fishing'], title:'Fall salmon run peaks this week', detail:'Lake Michigan tributaries seeing heavy runs', time:'12h ago', type:'seasonal'},
+  {interests:['gaming'], title:'GTA VI trailer #3 released', detail:'New gameplay footage shows Vice City map', time:'1h ago', type:'release'},
+  {interests:['cars'], title:'2027 Porsche 911 GT3 revealed', detail:'New naturally aspirated flat-six with 510hp', time:'3h ago', type:'release'},
+  {interests:['cooking'], title:'New season of The Bear drops', detail:'Season 4 streaming now on Hulu', time:'6h ago', type:'release'},
+  {interests:['fitness'], title:'Chicago Marathon this weekend', detail:'Race day Sunday, road closures in effect', time:'1d ago', type:'event'},
+  {interests:['travel'], title:'Fare sale: Chicago to Tokyo $489 RT', detail:'ANA direct flights, travel Jan-Mar', time:'2h ago', type:'deal'},
+  {interests:['soccer'], title:'Premier League: Arsenal 3 - Chelsea 1', detail:'Arsenal extend lead at the top of the table', time:'5h ago', type:'sports'},
+  {interests:['wine'], title:'Beaujolais Nouveau release day', detail:'2026 vintage arrives this Thursday', time:'1d ago', type:'release'},
+  {interests:['hiking'], title:'Fall colors peaking in Starved Rock', detail:'Peak foliage this weekend, trails open', time:'8h ago', type:'seasonal'},
+  {interests:['coffee'], title:'Intelligentsia single origin drop', detail:'New Ethiopian Yirgacheffe limited batch', time:'3h ago', type:'release'},
+  {interests:['nhl'], title:'Blackhawks home opener tonight', detail:'Hawks vs Red Wings, 7:30pm at United Center', time:'5h ago', type:'sports'},
+];
+
+const AVATAR_COLORS = [
+  {bg:'rgba(255,107,53,0.15)',fg:'#ff6b35'},
+  {bg:'rgba(78,168,222,0.15)',fg:'#4ea8de'},
+  {bg:'rgba(176,124,216,0.15)',fg:'#b07cd8'},
+  {bg:'rgba(46,196,182,0.15)',fg:'#2ec4b6'},
+  {bg:'rgba(239,68,68,0.15)',fg:'#ef4444'},
+  {bg:'rgba(245,158,11,0.15)',fg:'#f59e0b'},
+  {bg:'rgba(16,185,129,0.15)',fg:'#10b981'},
+  {bg:'rgba(124,58,237,0.15)',fg:'#7c3aed'},
+];
+
+let friends = JSON.parse(localStorage.getItem('spark_friends') || '[]');
+let editingIdx = -1;
+
+// ===== RENDER =====
+function render() {
+  renderFriendCount();
+  renderFriendList();
+  renderFeed();
+}
+
+function renderFriendCount() {
+  document.getElementById('friendCount').textContent = `${friends.length} / 15 friends`;
+  document.getElementById('addBtn').disabled = friends.length >= 15;
+}
+
+function renderFriendList() {
+  const list = document.getElementById('friendList');
+  const empty = document.getElementById('emptyFriends');
+  if (friends.length === 0) {
+    list.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  list.innerHTML = friends.map((f, i) => {
+    const col = AVATAR_COLORS[i % AVATAR_COLORS.length];
+    const initial = f.name.charAt(0).toUpperCase();
+    const bdayStr = f.birthday ? formatBday(f.birthday) : '';
+    const tags = f.interests.map(id => {
+      const int = INTERESTS.find(x => x.id === id);
+      return int ? int.label : id;
+    });
+    if (f.customInterests) {
+      f.customInterests.forEach(c => tags.push(c));
+    }
+    return `<div class="friend-card animate-in delay-${Math.min(i+1,5)}">
+      <div class="friend-top">
+        <div class="friend-avatar" style="background:${col.bg};color:${col.fg}">${initial}</div>
+        <div class="friend-info">
+          <h3>${esc(f.name)}</h3>
+          <p>${f.phone || ''}${bdayStr ? (f.phone ? ' &middot; ' : '') + bdayStr : ''}</p>
+        </div>
+        <button class="friend-remove" onclick="removeFriend(${i})">&times;</button>
+      </div>
+      <div class="interest-tags">
+        ${tags.map(t => `<span class="interest-pill active">${esc(t)}</span>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderFeed() {
+  const list = document.getElementById('feedList');
+  const empty = document.getElementById('emptyFeed');
+
+  if (friends.length === 0) {
+    list.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+
+  // Match events to friends
+  const matched = [];
+  EVENT_SOURCES.forEach(ev => {
+    const matchedFriends = friends.filter(f => {
+      return f.interests.some(i => ev.interests.includes(i));
+    });
+    if (matchedFriends.length > 0) {
+      matched.push({...ev, friends: matchedFriends});
+    }
+  });
+
+  // Add birthday events
+  friends.forEach(f => {
+    if (!f.birthday) return;
+    const today = new Date();
+    const bday = new Date(f.birthday + 'T00:00:00');
+    bday.setFullYear(today.getFullYear());
+    const diff = Math.ceil((bday - today) / (1000*60*60*24));
+    if (diff >= 0 && diff <= 7) {
+      const label = diff === 0 ? 'TODAY' : diff === 1 ? 'Tomorrow' : `In ${diff} days`;
+      matched.unshift({
+        interests: ['birthday'],
+        title: `${f.name}'s birthday is ${label.toLowerCase()}!`,
+        detail: diff === 0 ? 'Send them something special' : 'Get something ready',
+        time: label,
+        type: 'birthday',
+        friends: [f]
+      });
+    }
+  });
+
+  if (matched.length === 0) {
+    list.innerHTML = '';
+    empty.style.display = 'block';
+    empty.querySelector('h3').textContent = 'No matches yet';
+    empty.querySelector('p').textContent = "Your friends' interests don't match any current events. Add more interests or check back later.";
+    return;
+  }
+  empty.style.display = 'none';
+
+  list.innerHTML = matched.map((ev, idx) => {
+    const evId = `ev-${idx}`;
+    const typeColors = {
+      sports: {bg:'rgba(78,168,222,0.15)', fg:'#4ea8de'},
+      release: {bg:'rgba(255,107,53,0.15)', fg:'#ff6b35'},
+      market: {bg:'rgba(34,197,94,0.15)', fg:'#22c55e'},
+      birthday: {bg:'rgba(245,158,11,0.15)', fg:'#f59e0b'},
+      seasonal: {bg:'rgba(101,163,13,0.15)', fg:'#65a30d'},
+      event: {bg:'rgba(176,124,216,0.15)', fg:'#b07cd8'},
+      deal: {bg:'rgba(6,182,212,0.15)', fg:'#06b6d4'},
+    };
+    const tc = typeColors[ev.type] || typeColors.sports;
+
+    return `<div class="event-card animate-in delay-${Math.min(idx+1,5)}">
+      <div class="event-top">
+        <div class="event-icon" style="background:${tc.bg};color:${tc.fg}">${eventTypeIcon(ev.type)}</div>
+        <div class="event-info">
+          <h3>${esc(ev.title)}</h3>
+          <p>${esc(ev.detail)}</p>
+        </div>
+        <div class="event-time">${ev.time}</div>
+      </div>
+      <div class="event-match">
+        <span class="event-match-label">Matches:</span>
+        <div class="match-avatars">
+          ${ev.friends.map((f,fi) => {
+            const ci = friends.indexOf(f);
+            const col = AVATAR_COLORS[(ci >= 0 ? ci : fi) % AVATAR_COLORS.length];
+            return `<div class="match-avatar" style="background:${col.bg};color:${col.fg}">${f.name.charAt(0)}</div>`;
+          }).join('')}
+        </div>
+        <span class="event-match-label" style="margin-left:4px">${ev.friends.map(f => f.name).join(', ')}</span>
+      </div>
+      <div class="event-preview" id="preview-${evId}">
+        <canvas id="canvas-${evId}" width="640" height="400"></canvas>
+        <div class="preview-overlay" id="overlay-${evId}">
+          <button class="create-btn" style="width:auto;margin:0;padding:12px 24px" onclick="createContent('${evId}',${idx})">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            Create Content
+          </button>
+        </div>
+      </div>
+      <div class="send-row" id="sendrow-${evId}">
+        ${ev.friends.map(f => `<button class="send-to" onclick="sendTo('${esc(f.name)}')">${esc(f.name)}</button>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ===== CONTENT GENERATION =====
+function createContent(evId, idx) {
+  const btn = document.querySelector(`#overlay-${evId} .create-btn`);
+  btn.innerHTML = '<div class="generating"><div class="spinner"></div>Generating...</div>';
+
+  // Get matched event data
+  const matchedEvents = getMatchedEvents();
+  const ev = matchedEvents[idx];
+
+  setTimeout(() => {
+    const canvas = document.getElementById(`canvas-${evId}`);
+    if (canvas && ev) {
+      drawEventContent(canvas, ev);
+    }
+    document.getElementById(`overlay-${evId}`).classList.add('generated');
+    document.getElementById(`sendrow-${evId}`).classList.add('visible');
+    showToast('Content created!');
+  }, 1200);
+}
+
+function getMatchedEvents() {
+  const matched = [];
+  EVENT_SOURCES.forEach(ev => {
+    const matchedFriends = friends.filter(f => f.interests.some(i => ev.interests.includes(i)));
+    if (matchedFriends.length > 0) matched.push({...ev, friends: matchedFriends});
+  });
+  friends.forEach(f => {
+    if (!f.birthday) return;
+    const today = new Date();
+    const bday = new Date(f.birthday + 'T00:00:00');
+    bday.setFullYear(today.getFullYear());
+    const diff = Math.ceil((bday - today) / (1000*60*60*24));
+    if (diff >= 0 && diff <= 7) {
+      matched.unshift({interests:['birthday'],title:`${f.name}'s birthday`,detail:'',time:'',type:'birthday',friends:[f]});
+    }
+  });
+  return matched;
+}
+
+function drawEventContent(canvas, ev) {
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
   let frame = 0;
+  const type = ev.type;
+  const title = ev.title;
+  const friendNames = ev.friends.map(f => f.name).join(' & ');
+  const interest = ev.interests[0];
 
   function draw() {
     ctx.clearRect(0, 0, W, H);
 
-    // Dark navy stadium bg
-    const grad = ctx.createLinearGradient(0, 0, 0, H);
-    grad.addColorStop(0, '#0b1628');
-    grad.addColorStop(1, '#162d50');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, W, H);
-
-    // Stadium lights
-    for (let i = 0; i < 5; i++) {
-      const lx = W * 0.1 + (W * 0.8) * (i / 4);
-      const ly = 30;
-      ctx.beginPath();
-      const lgr = ctx.createRadialGradient(lx, ly, 0, lx, ly, 60);
-      lgr.addColorStop(0, 'rgba(255,220,150,0.3)');
-      lgr.addColorStop(1, 'rgba(255,220,150,0)');
-      ctx.fillStyle = lgr;
-      ctx.arc(lx, ly, 60, 0, Math.PI * 2);
-      ctx.fill();
+    if (interest === 'nfl' || interest === 'nba' || interest === 'mlb' || interest === 'nhl' || interest === 'mma' || interest === 'soccer') {
+      drawSportsContent(ctx, W, H, frame, title, interest);
+    } else if (interest === 'bourbon' || interest === 'beer' || interest === 'wine' || interest === 'coffee') {
+      drawDrinkContent(ctx, W, H, frame, title, interest);
+    } else if (interest === 'birthday') {
+      drawBirthdayContent(ctx, W, H, frame, ev.friends[0].name);
+    } else if (interest === 'golf') {
+      drawGolfContent(ctx, W, H, frame, title);
+    } else if (interest === 'crypto' || interest === 'stocks') {
+      drawMarketContent(ctx, W, H, frame, title, interest);
+    } else if (interest === 'gaming') {
+      drawGamingContent(ctx, W, H, frame, title);
+    } else {
+      drawGenericContent(ctx, W, H, frame, title, interest);
     }
 
-    // Field
-    ctx.fillStyle = '#1a5c2a';
-    ctx.fillRect(0, H * 0.55, W, H * 0.45);
-    // Yard lines
-    ctx.strokeStyle = 'rgba(255,255,255,0.15)';
-    ctx.lineWidth = 2;
-    for (let i = 0; i < 10; i++) {
-      const x = W * 0.05 + (W * 0.9) * (i / 9);
-      ctx.beginPath(); ctx.moveTo(x, H * 0.55); ctx.lineTo(x, H); ctx.stroke();
-    }
-
-    // Scoreboard
-    const sbW = large ? 280 : 240;
-    const sbH = large ? 90 : 70;
-    const sbX = (W - sbW) / 2;
-    const sbY = H * 0.12;
-    ctx.fillStyle = '#111';
-    ctx.strokeStyle = '#333';
-    ctx.lineWidth = 2;
-    roundRect(ctx, sbX, sbY, sbW, sbH, 8);
-    ctx.fill(); ctx.stroke();
-
-    const sz = large ? 16 : 13;
-    ctx.font = `bold ${sz}px Inter, sans-serif`;
-    ctx.textAlign = 'center';
-    ctx.fillStyle = '#ff6b35';
-    ctx.fillText('BEARS', sbX + sbW * 0.25, sbY + sbH * 0.4);
-    ctx.fillStyle = '#2d6a2e';
-    ctx.fillText('PACKERS', sbX + sbW * 0.75, sbY + sbH * 0.4);
-
-    const numSz = large ? 32 : 24;
-    ctx.font = `900 ${numSz}px Inter, sans-serif`;
-    ctx.fillStyle = '#ef4444';
-    ctx.fillText('17', sbX + sbW * 0.25, sbY + sbH * 0.8);
-    ctx.fillStyle = '#4ade80';
-    ctx.fillText('24', sbX + sbW * 0.75, sbY + sbH * 0.8);
-
-    ctx.fillStyle = '#666';
-    ctx.font = `bold ${large ? 12 : 10}px Inter, sans-serif`;
-    ctx.fillText('FINAL', sbX + sbW * 0.5, sbY + sbH * 0.6);
-
-    // Sad bear character
-    const bx = W * 0.5;
-    const by = H * 0.72;
-    const bs = large ? 1.0 : 0.7;
-    const bob = Math.sin(frame * 0.05) * 3;
-
-    // Body
-    ctx.fillStyle = '#8B5E3C';
-    ctx.beginPath();
-    ctx.ellipse(bx, by + 20 * bs + bob, 35 * bs, 45 * bs, 0, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Head
-    ctx.beginPath();
-    ctx.arc(bx, by - 30 * bs + bob, 30 * bs, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Ears
-    ctx.beginPath();
-    ctx.arc(bx - 22 * bs, by - 52 * bs + bob, 12 * bs, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(bx + 22 * bs, by - 52 * bs + bob, 12 * bs, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#6B4226';
-    ctx.beginPath();
-    ctx.arc(bx - 22 * bs, by - 52 * bs + bob, 7 * bs, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(bx + 22 * bs, by - 52 * bs + bob, 7 * bs, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Snout
-    ctx.fillStyle = '#C4915A';
-    ctx.beginPath();
-    ctx.ellipse(bx, by - 22 * bs + bob, 14 * bs, 10 * bs, 0, 0, Math.PI * 2);
-    ctx.fill();
-
-    // X eyes (dead inside)
-    ctx.strokeStyle = '#fff';
-    ctx.lineWidth = 3 * bs;
-    ctx.lineCap = 'round';
-    const ex = 10 * bs, ey = by - 35 * bs + bob;
-    // Left X
-    ctx.beginPath(); ctx.moveTo(bx - ex - 5*bs, ey - 5*bs); ctx.lineTo(bx - ex + 5*bs, ey + 5*bs); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(bx - ex + 5*bs, ey - 5*bs); ctx.lineTo(bx - ex - 5*bs, ey + 5*bs); ctx.stroke();
-    // Right X
-    ctx.beginPath(); ctx.moveTo(bx + ex - 5*bs, ey - 5*bs); ctx.lineTo(bx + ex + 5*bs, ey + 5*bs); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(bx + ex + 5*bs, ey - 5*bs); ctx.lineTo(bx + ex - 5*bs, ey + 5*bs); ctx.stroke();
-
-    // Nose
-    ctx.fillStyle = '#333';
-    ctx.beginPath();
-    ctx.ellipse(bx, by - 23 * bs + bob, 5 * bs, 4 * bs, 0, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Frown
-    ctx.strokeStyle = '#333';
-    ctx.lineWidth = 2 * bs;
-    ctx.beginPath();
-    ctx.arc(bx, by - 12 * bs + bob, 8 * bs, 0.2, Math.PI - 0.2, true);
-    ctx.stroke();
-
-    // Jersey
-    ctx.fillStyle = '#0B162A';
-    ctx.beginPath();
-    ctx.ellipse(bx, by + 25 * bs + bob, 28 * bs, 30 * bs, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#ff6b35';
-    ctx.font = `900 ${20 * bs}px Inter, sans-serif`;
-    ctx.textAlign = 'center';
-    ctx.fillText('C', bx, by + 32 * bs + bob);
-
-    // Tear drops
-    const tearY = ey + 12 * bs + ((frame * 2) % 30) * bs;
-    const tearAlpha = 1 - ((frame * 2) % 30) / 30;
-    ctx.fillStyle = `rgba(100,180,255,${tearAlpha})`;
-    ctx.beginPath();
-    ctx.arc(bx - ex, tearY, 3 * bs, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(bx + ex, tearY + 8, 3 * bs, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Text overlay
-    if (large) {
-      ctx.fillStyle = '#fff';
-      ctx.font = '900 28px Inter, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.lineWidth = 4;
-      ctx.strokeStyle = '#000';
-      ctx.strokeText('EVERY. SINGLE. WEEK.', W/2, H - 30);
-      ctx.fillText('EVERY. SINGLE. WEEK.', W/2, H - 30);
-    }
+    // Spark watermark
+    ctx.fillStyle = 'rgba(255,255,255,0.15)';
+    ctx.font = '600 10px Inter, sans-serif';
+    ctx.textAlign = 'right';
+    ctx.fillText('made with Spark', W - 12, H - 10);
 
     frame++;
     requestAnimationFrame(draw);
@@ -674,861 +541,454 @@ function drawBearsGif(canvasId, large) {
   draw();
 }
 
-function drawBourbonGif(canvasId, large) {
-  const c = document.getElementById(canvasId);
-  if (!c) return;
-  const ctx = c.getContext('2d');
-  const W = c.width, H = c.height;
-  let frame = 0;
-  const particles = [];
-  for (let i = 0; i < 20; i++) {
-    particles.push({
-      x: Math.random() * W, y: Math.random() * H,
-      vx: (Math.random() - 0.5) * 0.5, vy: -Math.random() * 1.5 - 0.5,
-      size: Math.random() * 3 + 1, life: Math.random()
-    });
+// ---- CONTENT RENDERERS ----
+
+function drawSportsContent(ctx, W, H, frame, title, sport) {
+  // Stadium bg
+  const grad = ctx.createLinearGradient(0, 0, 0, H);
+  grad.addColorStop(0, '#0b1628'); grad.addColorStop(1, '#162d50');
+  ctx.fillStyle = grad; ctx.fillRect(0, 0, W, H);
+
+  // Field
+  const fieldColor = sport === 'nhl' ? '#c8dce8' : sport === 'nba' ? '#c9884a' : '#1a5c2a';
+  ctx.fillStyle = fieldColor;
+  ctx.fillRect(0, H * 0.55, W, H * 0.45);
+
+  // Lines on field
+  ctx.strokeStyle = 'rgba(255,255,255,0.15)'; ctx.lineWidth = 2;
+  for (let i = 0; i < 10; i++) {
+    const x = W*0.05 + (W*0.9)*(i/9);
+    ctx.beginPath(); ctx.moveTo(x, H*0.55); ctx.lineTo(x, H); ctx.stroke();
   }
 
-  function draw() {
-    ctx.clearRect(0, 0, W, H);
+  // Stadium lights
+  for (let i = 0; i < 5; i++) {
+    const lx = W*0.1 + (W*0.8)*(i/4);
+    const lgr = ctx.createRadialGradient(lx, 20, 0, lx, 20, 50);
+    lgr.addColorStop(0, 'rgba(255,220,150,0.3)'); lgr.addColorStop(1, 'rgba(255,220,150,0)');
+    ctx.fillStyle = lgr; ctx.beginPath(); ctx.arc(lx, 20, 50, 0, Math.PI*2); ctx.fill();
+  }
 
-    // Warm gradient bg
-    const grad = ctx.createRadialGradient(W/2, H*0.6, 0, W/2, H*0.6, W*0.7);
-    grad.addColorStop(0, '#3d1f00');
-    grad.addColorStop(0.5, '#1a0e00');
-    grad.addColorStop(1, '#0a0500');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, W, H);
+  // Scoreboard
+  const sbW = 260, sbH = 80, sbX = (W-sbW)/2, sbY = H*0.1;
+  ctx.fillStyle = '#111'; roundRect(ctx, sbX, sbY, sbW, sbH, 8); ctx.fill();
+  ctx.strokeStyle = '#333'; ctx.lineWidth = 2; roundRect(ctx, sbX, sbY, sbW, sbH, 8); ctx.stroke();
 
-    // Warm glow behind bottle
-    const glow = ctx.createRadialGradient(W/2, H*0.55, 0, W/2, H*0.55, 120);
-    glow.addColorStop(0, 'rgba(255,140,0,0.15)');
-    glow.addColorStop(1, 'rgba(255,140,0,0)');
-    ctx.fillStyle = glow;
-    ctx.fillRect(0, 0, W, H);
+  // Parse score from title if possible
+  const scoreMatch = title.match(/(\d+)[\s-]+(\d+)/);
+  if (scoreMatch) {
+    const teams = title.split(/\d/).filter(Boolean);
+    ctx.font = 'bold 14px Inter, sans-serif'; ctx.textAlign = 'center';
+    ctx.fillStyle = '#ff6b35';
+    ctx.fillText(title.split(/\s+\d/)[0].trim().substring(0, 12), sbX + sbW*0.25, sbY + sbH*0.35);
+    ctx.fillStyle = '#4ade80';
+    const afterScore = title.split(/\d+[\s-]+\d+/)[1] || '';
+    ctx.fillText(afterScore.trim().substring(0, 12), sbX + sbW*0.75, sbY + sbH*0.35);
+    ctx.font = '900 28px Inter, sans-serif';
+    ctx.fillStyle = '#ef4444'; ctx.fillText(scoreMatch[1], sbX + sbW*0.25, sbY + sbH*0.75);
+    ctx.fillStyle = '#4ade80'; ctx.fillText(scoreMatch[2], sbX + sbW*0.75, sbY + sbH*0.75);
+  }
 
-    const s = large ? 1.0 : 0.6;
-    const bx = W / 2;
-    const by = H * 0.5;
+  // Animated crowd dots
+  for (let i = 0; i < 40; i++) {
+    const cx = (i * 17.3 + Math.sin(frame*0.05 + i)*3) % W;
+    const cy = H*0.45 + (i * 3.7) % (H*0.12);
+    ctx.fillStyle = `hsl(${i*30},50%,50%)`;
+    ctx.beginPath(); ctx.arc(cx, cy, 3, 0, Math.PI*2); ctx.fill();
+  }
 
+  // Main text
+  memeText(ctx, title.length > 35 ? title.substring(0,35)+'...' : title, W/2, H - 30, 22);
+}
+
+function drawDrinkContent(ctx, W, H, frame, title, type) {
+  const grad = ctx.createRadialGradient(W/2, H*0.5, 0, W/2, H*0.5, W*0.7);
+  const colors = {
+    bourbon: ['#3d1f00','#1a0e00','#0a0500'],
+    beer: ['#3d2f00','#1a1500','#0a0800'],
+    wine: ['#3d0020','#1a000e','#0a0005'],
+    coffee: ['#2d1a0d','#1a0e05','#0a0500'],
+  };
+  const c = colors[type] || colors.bourbon;
+  grad.addColorStop(0, c[0]); grad.addColorStop(0.5, c[1]); grad.addColorStop(1, c[2]);
+  ctx.fillStyle = grad; ctx.fillRect(0, 0, W, H);
+
+  // Warm glow
+  const glow = ctx.createRadialGradient(W/2, H*0.5, 0, W/2, H*0.5, 120);
+  glow.addColorStop(0, 'rgba(255,140,0,0.12)'); glow.addColorStop(1, 'rgba(255,140,0,0)');
+  ctx.fillStyle = glow; ctx.fillRect(0, 0, W, H);
+
+  const bx = W/2, by = H*0.45;
+
+  if (type === 'bourbon' || type === 'wine') {
     // Bottle
-    ctx.fillStyle = '#2a1800';
-    ctx.strokeStyle = '#5a3a1a';
-    ctx.lineWidth = 2;
-
-    // Bottle body
+    ctx.fillStyle = type === 'wine' ? '#2a0015' : '#2a1800';
     ctx.beginPath();
-    ctx.moveTo(bx - 30*s, by + 80*s);
-    ctx.lineTo(bx - 30*s, by - 20*s);
-    ctx.quadraticCurveTo(bx - 30*s, by - 40*s, bx - 15*s, by - 50*s);
-    ctx.lineTo(bx - 12*s, by - 80*s);
-    ctx.lineTo(bx + 12*s, by - 80*s);
-    ctx.lineTo(bx + 15*s, by - 50*s);
-    ctx.quadraticCurveTo(bx + 30*s, by - 40*s, bx + 30*s, by - 20*s);
-    ctx.lineTo(bx + 30*s, by + 80*s);
-    ctx.closePath();
-    ctx.fill(); ctx.stroke();
+    ctx.moveTo(bx-30, by+80); ctx.lineTo(bx-30, by-20);
+    ctx.quadraticCurveTo(bx-30, by-40, bx-15, by-50);
+    ctx.lineTo(bx-12, by-80); ctx.lineTo(bx+12, by-80);
+    ctx.lineTo(bx+15, by-50);
+    ctx.quadraticCurveTo(bx+30, by-40, bx+30, by-20);
+    ctx.lineTo(bx+30, by+80); ctx.closePath(); ctx.fill();
 
-    // Liquid level with wave
+    // Liquid wave
     ctx.save();
-    ctx.beginPath();
-    ctx.rect(bx - 29*s, by - 10*s, 58*s, 89*s);
-    ctx.clip();
-    const wave = Math.sin(frame * 0.06) * 4 * s;
-    ctx.fillStyle = '#8B4513';
-    ctx.beginPath();
-    ctx.moveTo(bx - 30*s, by + 80*s);
-    ctx.lineTo(bx - 30*s, by + 10*s + wave);
-    for (let x = -30; x <= 30; x += 5) {
-      ctx.lineTo(bx + x*s, by + 10*s + Math.sin((x + frame*2)*0.1)*4*s + wave);
-    }
-    ctx.lineTo(bx + 30*s, by + 80*s);
-    ctx.closePath();
-    ctx.fill();
+    ctx.beginPath(); ctx.rect(bx-29, by-10, 58, 89); ctx.clip();
+    const wave = Math.sin(frame*0.06)*4;
+    ctx.fillStyle = type === 'wine' ? '#5a0030' : '#8B4513';
+    ctx.beginPath(); ctx.moveTo(bx-30, by+80); ctx.lineTo(bx-30, by+10+wave);
+    for (let x=-30; x<=30; x+=5) ctx.lineTo(bx+x, by+10+Math.sin((x+frame*2)*0.1)*4+wave);
+    ctx.lineTo(bx+30, by+80); ctx.closePath(); ctx.fill();
     ctx.restore();
 
     // Label
     ctx.fillStyle = '#f5e6c8';
-    roundRect(ctx, bx - 24*s, by + 5*s, 48*s, 40*s, 4);
-    ctx.fill();
-    ctx.fillStyle = '#2a1800';
-    ctx.font = `900 ${8*s}px Inter, sans-serif`;
-    ctx.textAlign = 'center';
-    ctx.fillText('BUFFALO', bx, by + 22*s);
-    ctx.fillText('TRACE', bx, by + 32*s);
-    ctx.font = `600 ${5*s}px Inter, sans-serif`;
-    ctx.fillText('SINGLE BARREL', bx, by + 40*s);
+    roundRect(ctx, bx-24, by+5, 48, 40, 4); ctx.fill();
+    ctx.fillStyle = '#2a1800'; ctx.font = '900 8px Inter, sans-serif'; ctx.textAlign = 'center';
+    const labelLines = title.split(/\s+/).reduce((acc, word) => {
+      const last = acc[acc.length-1];
+      if (last && (last + ' ' + word).length < 14) acc[acc.length-1] += ' ' + word;
+      else acc.push(word);
+      return acc;
+    }, []);
+    labelLines.slice(0,3).forEach((line, i) => ctx.fillText(line, bx, by + 18 + i*10));
 
-    // Cap
-    ctx.fillStyle = '#1a0e00';
-    ctx.fillRect(bx - 10*s, by - 88*s, 20*s, 10*s);
-
-    // Sparkle particles
-    particles.forEach(p => {
-      p.x += p.vx;
-      p.y += p.vy;
-      p.life -= 0.008;
-      if (p.life <= 0 || p.y < 0) {
-        p.x = bx + (Math.random() - 0.5) * 80 * s;
-        p.y = by + 80 * s;
-        p.life = 1;
-        p.vy = -Math.random() * 1.5 - 0.5;
-      }
-      ctx.fillStyle = `rgba(255,180,50,${p.life * 0.6})`;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.size * s, 0, Math.PI * 2);
-      ctx.fill();
-    });
-
-    // Text
-    if (large) {
+    ctx.fillStyle = '#1a0e00'; ctx.fillRect(bx-10, by-88, 20, 10);
+  } else {
+    // Glass/mug
+    ctx.fillStyle = 'rgba(255,255,255,0.1)';
+    ctx.strokeStyle = 'rgba(255,255,255,0.3)'; ctx.lineWidth = 2;
+    roundRect(ctx, bx-25, by-40, 50, 100, 6); ctx.fill(); ctx.stroke();
+    // Liquid
+    ctx.fillStyle = type === 'beer' ? '#daa520' : '#3e1a00';
+    roundRect(ctx, bx-22, by-10, 44, 67, 4); ctx.fill();
+    if (type === 'beer') {
+      // Foam
       ctx.fillStyle = '#f5e6c8';
-      ctx.font = '900 24px Inter, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.strokeStyle = '#000';
-      ctx.lineWidth = 4;
-      ctx.strokeText('LIMITED DROP ALERT', W/2, H - 35);
-      ctx.fillText('LIMITED DROP ALERT', W/2, H - 35);
-      ctx.font = '600 14px Inter, sans-serif';
-      ctx.fillStyle = '#ff9f1c';
-      ctx.strokeText('Single Barrel Select', W/2, H - 14);
-      ctx.fillText('Single Barrel Select', W/2, H - 14);
-    }
-
-    frame++;
-    requestAnimationFrame(draw);
-  }
-  draw();
-}
-
-function drawSoccerGif(canvasId, large) {
-  const c = document.getElementById(canvasId);
-  if (!c) return;
-  const ctx = c.getContext('2d');
-  const W = c.width, H = c.height;
-  let frame = 0;
-
-  function draw() {
-    ctx.clearRect(0, 0, W, H);
-
-    // Sky
-    const sky = ctx.createLinearGradient(0, 0, 0, H * 0.6);
-    sky.addColorStop(0, '#1a3a5c');
-    sky.addColorStop(1, '#4a90c2');
-    ctx.fillStyle = sky;
-    ctx.fillRect(0, 0, W, H);
-
-    // Grass
-    ctx.fillStyle = '#2d8c3e';
-    ctx.fillRect(0, H * 0.55, W, H * 0.45);
-    // Grass stripes
-    ctx.fillStyle = '#34a047';
-    for (let i = 0; i < 8; i += 2) {
-      ctx.fillRect(W * (i/8), H * 0.55, W/8, H * 0.45);
-    }
-
-    // Goal posts
-    ctx.strokeStyle = '#fff';
-    ctx.lineWidth = large ? 5 : 3;
-    const gx = W * 0.5, gy = H * 0.4;
-    const gw = large ? 120 : 80;
-    const gh = large ? 70 : 45;
-    ctx.beginPath();
-    ctx.moveTo(gx - gw/2, gy + gh);
-    ctx.lineTo(gx - gw/2, gy);
-    ctx.lineTo(gx + gw/2, gy);
-    ctx.lineTo(gx + gw/2, gy + gh);
-    ctx.stroke();
-    // Net lines
-    ctx.strokeStyle = 'rgba(255,255,255,0.2)';
-    ctx.lineWidth = 1;
-    for (let i = 0; i < 8; i++) {
-      const nx = gx - gw/2 + (gw/7) * i;
-      ctx.beginPath(); ctx.moveTo(nx, gy); ctx.lineTo(nx, gy + gh); ctx.stroke();
-    }
-    for (let i = 0; i < 5; i++) {
-      const ny = gy + (gh/4) * i;
-      ctx.beginPath(); ctx.moveTo(gx - gw/2, ny); ctx.lineTo(gx + gw/2, ny); ctx.stroke();
-    }
-
-    // Soccer ball bouncing
-    const ballX = W * 0.5 + Math.sin(frame * 0.03) * 40;
-    const bounce = Math.abs(Math.sin(frame * 0.06)) * 40;
-    const ballY = H * 0.65 - bounce;
-    const ballR = large ? 18 : 12;
-
-    // Ball shadow
-    ctx.fillStyle = 'rgba(0,0,0,0.2)';
-    ctx.beginPath();
-    ctx.ellipse(ballX, H * 0.68, ballR * 1.2, 5, 0, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Ball
-    ctx.fillStyle = '#fff';
-    ctx.beginPath();
-    ctx.arc(ballX, ballY, ballR, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.strokeStyle = '#333';
-    ctx.lineWidth = 1.5;
-    ctx.stroke();
-
-    // Pentagon pattern on ball
-    ctx.fillStyle = '#333';
-    const rot = frame * 0.02;
-    for (let i = 0; i < 5; i++) {
-      const angle = rot + (Math.PI * 2 / 5) * i;
-      const px = ballX + Math.cos(angle) * ballR * 0.5;
-      const py = ballY + Math.sin(angle) * ballR * 0.5;
-      ctx.beginPath();
-      ctx.arc(px, py, ballR * 0.2, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    // Little kid figure
-    const kx = W * 0.3;
-    const ky = H * 0.65;
-    const ks = large ? 1 : 0.65;
-    const run = Math.sin(frame * 0.1) * 5;
-
-    // Legs
-    ctx.strokeStyle = '#f5c5a3';
-    ctx.lineWidth = 4 * ks;
-    ctx.lineCap = 'round';
-    ctx.beginPath(); ctx.moveTo(kx, ky + 15*ks); ctx.lineTo(kx - 8*ks, ky + 35*ks + run); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(kx, ky + 15*ks); ctx.lineTo(kx + 8*ks, ky + 35*ks - run); ctx.stroke();
-
-    // Body (jersey)
-    ctx.fillStyle = '#4ea8de';
-    ctx.beginPath();
-    ctx.ellipse(kx, ky + 5*ks, 12*ks, 15*ks, 0, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Head
-    ctx.fillStyle = '#f5c5a3';
-    ctx.beginPath();
-    ctx.arc(kx, ky - 15*ks, 10*ks, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Hair
-    ctx.fillStyle = '#5a3a1a';
-    ctx.beginPath();
-    ctx.arc(kx, ky - 18*ks, 10*ks, Math.PI, Math.PI * 2);
-    ctx.fill();
-
-    // Happy face
-    ctx.fillStyle = '#333';
-    ctx.beginPath();
-    ctx.arc(kx - 3*ks, ky - 16*ks, 1.5*ks, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(kx + 3*ks, ky - 16*ks, 1.5*ks, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.strokeStyle = '#333';
-    ctx.lineWidth = 1.5*ks;
-    ctx.beginPath();
-    ctx.arc(kx, ky - 11*ks, 4*ks, 0.2, Math.PI - 0.2);
-    ctx.stroke();
-
-    // Arms up (celebrating)
-    ctx.strokeStyle = '#f5c5a3';
-    ctx.lineWidth = 3*ks;
-    ctx.beginPath(); ctx.moveTo(kx - 10*ks, ky); ctx.lineTo(kx - 20*ks, ky - 15*ks + run*0.5); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(kx + 10*ks, ky); ctx.lineTo(kx + 20*ks, ky - 15*ks - run*0.5); ctx.stroke();
-
-    // Text
-    if (large) {
-      ctx.fillStyle = '#fff';
-      ctx.font = '900 26px Inter, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.strokeStyle = '#000';
-      ctx.lineWidth = 4;
-      ctx.strokeText('FIRST GAME DAY!', W/2, H - 25);
-      ctx.fillText('FIRST GAME DAY!', W/2, H - 25);
-    }
-
-    frame++;
-    requestAnimationFrame(draw);
-  }
-  draw();
-}
-
-// ---- Meme canvases (Jokes tab) ----
-
-function drawMemeWisconsin(canvasId) {
-  const c = document.getElementById(canvasId);
-  if (!c) return;
-  const ctx = c.getContext('2d');
-  const W = c.width, H = c.height;
-  let frame = 0;
-
-  function draw() {
-    ctx.clearRect(0, 0, W, H);
-
-    // Night sky
-    const grad = ctx.createLinearGradient(0, 0, 0, H);
-    grad.addColorStop(0, '#0a0a2e');
-    grad.addColorStop(0.6, '#1a1a3e');
-    grad.addColorStop(1, '#0d2b0d');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, W, H);
-
-    // Stars
-    for (let i = 0; i < 30; i++) {
-      const sx = (i * 137.5 + frame * 0.1) % W;
-      const sy = (i * 97.3) % (H * 0.5);
-      const twinkle = Math.sin(frame * 0.05 + i) * 0.5 + 0.5;
-      ctx.fillStyle = `rgba(255,255,255,${twinkle * 0.7})`;
-      ctx.beginPath();
-      ctx.arc(sx, sy, 1.5, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    // Moon
-    ctx.fillStyle = '#e8e0c0';
-    ctx.beginPath();
-    ctx.arc(W * 0.8, H * 0.15, 35, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Dark trees silhouette
-    for (let i = 0; i < 12; i++) {
-      const tx = W * (i / 11);
-      const th = 80 + Math.sin(i * 2.3) * 40;
-      ctx.fillStyle = '#0a1a0a';
-      ctx.beginPath();
-      ctx.moveTo(tx - 15, H * 0.65);
-      ctx.lineTo(tx, H * 0.65 - th);
-      ctx.lineTo(tx + 15, H * 0.65);
-      ctx.fill();
-    }
-
-    // Road
-    ctx.fillStyle = '#1a1a1a';
-    ctx.beginPath();
-    ctx.moveTo(W * 0.3, H);
-    ctx.lineTo(W * 0.48, H * 0.5);
-    ctx.lineTo(W * 0.52, H * 0.5);
-    ctx.lineTo(W * 0.7, H);
-    ctx.fill();
-
-    // Road dashes
-    ctx.strokeStyle = '#ff0';
-    ctx.lineWidth = 2;
-    ctx.setLineDash([15, 20]);
-    ctx.lineDashOffset = -frame * 2;
-    ctx.beginPath();
-    ctx.moveTo(W * 0.5, H * 0.55);
-    ctx.lineTo(W * 0.5, H);
-    ctx.stroke();
-    ctx.setLineDash([]);
-
-    // "WELCOME TO NOWHERE" sign
-    const signBob = Math.sin(frame * 0.04) * 2;
-    ctx.fillStyle = '#1a5c2a';
-    roundRect(ctx, W * 0.1, H * 0.55 + signBob, 160, 50, 6);
-    ctx.fill();
-    ctx.strokeStyle = '#fff';
-    ctx.lineWidth = 2;
-    roundRect(ctx, W * 0.1 + 4, H * 0.55 + 4 + signBob, 152, 42, 4);
-    ctx.stroke();
-    ctx.fillStyle = '#fff';
-    ctx.font = '900 11px Inter, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('WELCOME TO', W * 0.1 + 80, H * 0.55 + 24 + signBob);
-    ctx.fillText('NOWHERE, WI', W * 0.1 + 80, H * 0.55 + 40 + signBob);
-
-    // Sign post
-    ctx.fillStyle = '#555';
-    ctx.fillRect(W * 0.1 + 76, H * 0.55 + 50 + signBob, 8, 40);
-
-    // Car headlights
-    const carX = W * 0.5;
-    const carY = H * 0.78;
-    ctx.fillStyle = 'rgba(255,240,150,0.1)';
-    ctx.beginPath();
-    ctx.moveTo(carX - 10, carY);
-    ctx.lineTo(carX - 60, carY - 100);
-    ctx.lineTo(carX + 60, carY - 100);
-    ctx.lineTo(carX + 10, carY);
-    ctx.fill();
-
-    // Car
-    ctx.fillStyle = '#333';
-    roundRect(ctx, carX - 30, carY, 60, 25, 6);
-    ctx.fill();
-    ctx.fillStyle = '#444';
-    roundRect(ctx, carX - 22, carY - 15, 44, 18, 4);
-    ctx.fill();
-    // Headlights
-    ctx.fillStyle = '#ffee88';
-    ctx.beginPath(); ctx.arc(carX - 25, carY + 8, 4, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.arc(carX + 25, carY + 8, 4, 0, Math.PI * 2); ctx.fill();
-
-    // Meme text
-    memeText(ctx, 'WHEN DAVE SAYS', W/2, 40, 28);
-    memeText(ctx, '"I KNOW A SHORTCUT"', W/2, 75, 28);
-    memeText(ctx, '3 HOURS LATER...', W/2, H - 20, 24);
-
-    frame++;
-    requestAnimationFrame(draw);
-  }
-  draw();
-}
-
-function drawMemePoker(canvasId) {
-  const c = document.getElementById(canvasId);
-  if (!c) return;
-  const ctx = c.getContext('2d');
-  const W = c.width, H = c.height;
-  let frame = 0;
-
-  function draw() {
-    ctx.clearRect(0, 0, W, H);
-
-    // Casino bg
-    const grad = ctx.createRadialGradient(W/2, H/2, 0, W/2, H/2, W * 0.6);
-    grad.addColorStop(0, '#1a3a1a');
-    grad.addColorStop(1, '#0a150a');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, W, H);
-
-    // Felt texture dots
-    ctx.fillStyle = 'rgba(255,255,255,0.02)';
-    for (let i = 0; i < 50; i++) {
-      ctx.beginPath();
-      ctx.arc((i * 83.7) % W, (i * 127.3) % H, 2, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    // Poker table oval
-    ctx.fillStyle = '#0d4d0d';
-    ctx.strokeStyle = '#4a2a00';
-    ctx.lineWidth = 12;
-    ctx.beginPath();
-    ctx.ellipse(W/2, H * 0.55, W * 0.4, H * 0.3, 0, 0, Math.PI * 2);
-    ctx.fill(); ctx.stroke();
-
-    // Inner felt line
-    ctx.strokeStyle = '#1a6a1a';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.ellipse(W/2, H * 0.55, W * 0.35, H * 0.25, 0, 0, Math.PI * 2);
-    ctx.stroke();
-
-    // Chip stacks
-    drawChipStack(ctx, W * 0.25, H * 0.5, frame);
-    drawChipStack(ctx, W * 0.75, H * 0.5, frame + 10);
-
-    // Cards face up - pair of 3s
-    const cardW = 50, cardH = 70;
-    const cx = W/2 - 30, cy = H * 0.45;
-    const tilt1 = -0.15 + Math.sin(frame * 0.02) * 0.02;
-    const tilt2 = 0.15 + Math.sin(frame * 0.02 + 1) * 0.02;
-
-    drawCard(ctx, cx - 15, cy, cardW, cardH, '3', 'hearts', tilt1);
-    drawCard(ctx, cx + 25, cy, cardW, cardH, '3', 'diamonds', tilt2);
-
-    // Pot amount
-    ctx.fillStyle = '#ffcc00';
-    ctx.font = '900 20px Inter, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.strokeStyle = '#000';
-    ctx.lineWidth = 3;
-    const potBob = Math.sin(frame * 0.05) * 2;
-    ctx.strokeText('POT: $2,847', W/2, H * 0.7 + potBob);
-    ctx.fillText('POT: $2,847', W/2, H * 0.7 + potBob);
-
-    // Meme text
-    memeText(ctx, 'MIKE: "I\'M ALL IN"', W/2, 40, 26);
-    memeText(ctx, 'NARRATOR: HE HAD', W/2, H - 50, 22);
-    memeText(ctx, 'A PAIR OF 3s', W/2, H - 22, 26);
-
-    frame++;
-    requestAnimationFrame(draw);
-  }
-  draw();
-}
-
-function drawMemePizza(canvasId) {
-  const c = document.getElementById(canvasId);
-  if (!c) return;
-  const ctx = c.getContext('2d');
-  const W = c.width, H = c.height;
-  let frame = 0;
-
-  function draw() {
-    ctx.clearRect(0, 0, W, H);
-
-    // Warm pizza joint bg
-    const grad = ctx.createLinearGradient(0, 0, 0, H);
-    grad.addColorStop(0, '#2a1500');
-    grad.addColorStop(1, '#1a0d00');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, W, H);
-
-    // Checkerboard table
-    const tileSize = 30;
-    for (let row = 0; row < 6; row++) {
-      for (let col = 0; col < W/tileSize + 1; col++) {
-        ctx.fillStyle = (row + col) % 2 === 0 ? '#cc3333' : '#fff';
-        ctx.globalAlpha = 0.1;
-        ctx.fillRect(col * tileSize, H * 0.6 + row * tileSize, tileSize, tileSize);
-      }
-    }
-    ctx.globalAlpha = 1;
-
-    // Pizza box
-    ctx.fillStyle = '#d4a056';
-    roundRect(ctx, W * 0.15, H * 0.35, W * 0.7, H * 0.35, 8);
-    ctx.fill();
-    ctx.strokeStyle = '#8B6914';
-    ctx.lineWidth = 2;
-    roundRect(ctx, W * 0.15, H * 0.35, W * 0.7, H * 0.35, 8);
-    ctx.stroke();
-
-    // Pizza slices (progressively disappearing)
-    const slicesGone = Math.floor((frame / 60) % 5);
-    const centerX = W * 0.5;
-    const centerY = H * 0.52;
-    const radius = 80;
-
-    for (let i = 0; i < 8; i++) {
-      if (i < slicesGone) continue;
-      const startAngle = (Math.PI * 2 / 8) * i - Math.PI / 2;
-      const endAngle = startAngle + Math.PI * 2 / 8;
-
-      // Crust
-      ctx.fillStyle = '#e8c060';
-      ctx.beginPath();
-      ctx.moveTo(centerX, centerY);
-      ctx.arc(centerX, centerY, radius, startAngle, endAngle);
-      ctx.closePath();
-      ctx.fill();
-
-      // Sauce
-      ctx.fillStyle = '#cc3333';
-      ctx.beginPath();
-      ctx.moveTo(centerX, centerY);
-      ctx.arc(centerX, centerY, radius * 0.85, startAngle + 0.05, endAngle - 0.05);
-      ctx.closePath();
-      ctx.fill();
-
-      // Cheese
-      ctx.fillStyle = '#f0d060';
-      ctx.beginPath();
-      ctx.moveTo(centerX, centerY);
-      ctx.arc(centerX, centerY, radius * 0.8, startAngle + 0.08, endAngle - 0.08);
-      ctx.closePath();
-      ctx.fill();
-
-      // Pepperoni
-      const pepAngle = (startAngle + endAngle) / 2;
-      const pepR = radius * 0.55;
-      ctx.fillStyle = '#aa2222';
-      ctx.beginPath();
-      ctx.arc(centerX + Math.cos(pepAngle) * pepR, centerY + Math.sin(pepAngle) * pepR, 7, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    // Slice count
-    const remaining = 8 - slicesGone;
-    ctx.fillStyle = '#fff';
-    ctx.font = '900 16px Inter, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.strokeStyle = '#000';
-    ctx.lineWidth = 3;
-    const countText = `${8 - remaining}/8 SLICES GONE`;
-    ctx.strokeText(countText, W/2, H * 0.78);
-    ctx.fillText(countText, W/2, H * 0.78);
-
-    // Meme text
-    memeText(ctx, 'JAKE: "JUST ONE SLICE"', W/2, 36, 24);
-    memeText(ctx, '"I WASN\'T EVEN HUNGRY"', W/2, H - 20, 22);
-
-    frame++;
-    requestAnimationFrame(draw);
-  }
-  draw();
-}
-
-// Nudge thumbnails (smaller, no text)
-function drawNudgeThumb(canvasId, type) {
-  const c = document.getElementById(canvasId);
-  if (!c) return;
-  const ctx = c.getContext('2d');
-  const W = c.width, H = c.height;
-  let frame = 0;
-
-  function draw() {
-    ctx.clearRect(0, 0, W, H);
-
-    if (type === 'bears') {
-      const grad = ctx.createLinearGradient(0, 0, 0, H);
-      grad.addColorStop(0, '#0b1628');
-      grad.addColorStop(1, '#162d50');
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, W, H);
-      ctx.fillStyle = '#1a5c2a';
-      ctx.fillRect(0, H * 0.65, W, H * 0.35);
-      // Mini scoreboard
-      ctx.fillStyle = '#111';
-      roundRect(ctx, W * 0.2, H * 0.15, W * 0.6, H * 0.4, 6);
-      ctx.fill();
-      ctx.fillStyle = '#ef4444';
-      ctx.font = 'bold 18px Inter, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('17', W * 0.38, H * 0.45);
-      ctx.fillStyle = '#4ade80';
-      ctx.fillText('24', W * 0.62, H * 0.45);
-      ctx.fillStyle = '#ff6b35';
-      ctx.font = 'bold 9px Inter, sans-serif';
-      ctx.fillText('CHI', W * 0.38, H * 0.25);
-      ctx.fillStyle = '#2d6a2e';
-      ctx.fillText('GB', W * 0.62, H * 0.25);
-      // L stamp
-      ctx.save();
-      ctx.translate(W * 0.78, H * 0.6);
-      ctx.rotate(-0.2);
-      ctx.fillStyle = 'rgba(239,68,68,0.3)';
-      ctx.font = '900 36px Inter, sans-serif';
-      ctx.fillText('L', 0, 0);
-      ctx.restore();
-    }
-    else if (type === 'bourbon') {
-      const grad = ctx.createRadialGradient(W/2, H/2, 0, W/2, H/2, W*0.6);
-      grad.addColorStop(0, '#3d1f00');
-      grad.addColorStop(1, '#0a0500');
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, W, H);
-      // Mini bottle
-      const bx = W/2, by = H/2;
-      ctx.fillStyle = '#2a1800';
-      ctx.beginPath();
-      ctx.moveTo(bx-16, by+40); ctx.lineTo(bx-16, by-10);
-      ctx.quadraticCurveTo(bx-16, by-22, bx-8, by-28);
-      ctx.lineTo(bx-6, by-45); ctx.lineTo(bx+6, by-45);
-      ctx.lineTo(bx+8, by-28);
-      ctx.quadraticCurveTo(bx+16, by-22, bx+16, by-10);
-      ctx.lineTo(bx+16, by+40); ctx.closePath(); ctx.fill();
-      ctx.fillStyle = '#f5e6c8';
-      roundRect(ctx, bx-12, by+5, 24, 20, 3);
-      ctx.fill();
-      // Glow
-      const glow = ctx.createRadialGradient(bx, by, 0, bx, by, 60);
-      glow.addColorStop(0, 'rgba(255,140,0,0.1)');
-      glow.addColorStop(1, 'rgba(255,140,0,0)');
-      ctx.fillStyle = glow;
-      ctx.fillRect(0, 0, W, H);
-    }
-    else if (type === 'soccer') {
-      const sky = ctx.createLinearGradient(0, 0, 0, H);
-      sky.addColorStop(0, '#1a3a5c');
-      sky.addColorStop(1, '#4a90c2');
-      ctx.fillStyle = sky;
-      ctx.fillRect(0, 0, W, H);
-      ctx.fillStyle = '#2d8c3e';
-      ctx.fillRect(0, H * 0.6, W, H * 0.4);
-      // Ball
-      const bounce = Math.abs(Math.sin(frame * 0.06)) * 20;
-      ctx.fillStyle = '#fff';
-      ctx.beginPath();
-      ctx.arc(W/2, H * 0.55 - bounce, 14, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.strokeStyle = '#333'; ctx.lineWidth = 1;
-      ctx.stroke();
-      // Pentagon
-      ctx.fillStyle = '#333';
       for (let i = 0; i < 5; i++) {
-        const a = frame*0.02 + (Math.PI*2/5)*i;
         ctx.beginPath();
-        ctx.arc(W/2 + Math.cos(a)*7, H*0.55-bounce+Math.sin(a)*7, 3, 0, Math.PI*2);
+        ctx.arc(bx - 16 + i*8, by - 10 + Math.sin(frame*0.05+i)*2, 8, 0, Math.PI*2);
         ctx.fill();
       }
     }
-    else if (type === 'bday') {
-      const grad = ctx.createLinearGradient(0, 0, 0, H);
-      grad.addColorStop(0, '#1a0a2e');
-      grad.addColorStop(1, '#2a1040');
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, W, H);
-      // Confetti
-      for (let i = 0; i < 15; i++) {
-        const cx2 = (i * 47.3 + frame * 0.5) % W;
-        const cy2 = (i * 31.7 + frame * 0.8) % H;
-        ctx.fillStyle = ['#ff6b35','#ff9f1c','#4ea8de','#b07cd8','#2ec4b6'][i % 5];
-        ctx.save();
-        ctx.translate(cx2, cy2);
-        ctx.rotate(frame * 0.02 + i);
-        ctx.fillRect(-3, -6, 6, 12);
-        ctx.restore();
-      }
-      // Cake
-      const ckx = W/2, cky = H * 0.6;
-      ctx.fillStyle = '#d4856a';
-      roundRect(ctx, ckx-30, cky, 60, 35, 4);
-      ctx.fill();
-      ctx.fillStyle = '#f0a0a0';
-      roundRect(ctx, ckx-30, cky, 60, 12, 4);
-      ctx.fill();
-      // Candles
-      for (let i = 0; i < 3; i++) {
-        const candleX = ckx - 15 + i * 15;
-        ctx.fillStyle = '#4ea8de';
-        ctx.fillRect(candleX - 2, cky - 18, 4, 20);
-        // Flame
-        const flicker = Math.sin(frame * 0.15 + i) * 2;
-        ctx.fillStyle = '#ff9f1c';
-        ctx.beginPath();
-        ctx.ellipse(candleX, cky - 22 + flicker, 4, 7, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = '#ffee88';
-        ctx.beginPath();
-        ctx.ellipse(candleX, cky - 22 + flicker, 2, 4, 0, 0, Math.PI * 2);
-        ctx.fill();
-      }
+    // Handle for beer
+    if (type === 'beer') {
+      ctx.strokeStyle = 'rgba(255,255,255,0.3)'; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.arc(bx+35, by+10, 15, -Math.PI/2, Math.PI/2); ctx.stroke();
     }
-
-    frame++;
-    requestAnimationFrame(draw);
   }
-  draw();
+
+  // Sparkle particles
+  for (let i = 0; i < 12; i++) {
+    const px = bx + Math.sin(frame*0.03 + i*0.5)*60;
+    const py = by + 80 - ((frame*1.5 + i*20) % 160);
+    const alpha = 1 - ((frame*1.5 + i*20) % 160)/160;
+    ctx.fillStyle = `rgba(255,180,50,${alpha*0.5})`;
+    ctx.beginPath(); ctx.arc(px, py, 2, 0, Math.PI*2); ctx.fill();
+  }
+
+  memeText(ctx, title.length > 40 ? title.substring(0,40)+'...' : title, W/2, H-25, 20);
 }
 
-// ---- Helpers ----
+function drawBirthdayContent(ctx, W, H, frame, name) {
+  const grad = ctx.createLinearGradient(0, 0, 0, H);
+  grad.addColorStop(0, '#1a0a2e'); grad.addColorStop(1, '#2a1040');
+  ctx.fillStyle = grad; ctx.fillRect(0, 0, W, H);
 
+  // Confetti
+  for (let i = 0; i < 30; i++) {
+    const cx2 = (i*47.3 + frame*0.8) % W;
+    const cy2 = (i*31.7 + frame*1.2) % H;
+    ctx.fillStyle = ['#ff6b35','#ff9f1c','#4ea8de','#b07cd8','#2ec4b6','#ef4444'][i%6];
+    ctx.save(); ctx.translate(cx2, cy2); ctx.rotate(frame*0.02+i);
+    ctx.fillRect(-3, -6, 6, 12); ctx.restore();
+  }
+
+  // Cake
+  const ckx = W/2, cky = H*0.55;
+  // Plate
+  ctx.fillStyle = '#ddd';
+  ctx.beginPath(); ctx.ellipse(ckx, cky+45, 80, 15, 0, 0, Math.PI*2); ctx.fill();
+  // Bottom tier
+  ctx.fillStyle = '#d4856a'; roundRect(ctx, ckx-60, cky, 120, 45, 6); ctx.fill();
+  ctx.fillStyle = '#f0a0a0'; roundRect(ctx, ckx-60, cky, 120, 15, 6); ctx.fill();
+  // Top tier
+  ctx.fillStyle = '#e8a080'; roundRect(ctx, ckx-40, cky-35, 80, 38, 6); ctx.fill();
+  ctx.fillStyle = '#f5c0b0'; roundRect(ctx, ckx-40, cky-35, 80, 12, 6); ctx.fill();
+
+  // Candles
+  for (let i = 0; i < 5; i++) {
+    const candleX = ckx - 28 + i*14;
+    ctx.fillStyle = ['#4ea8de','#ff6b35','#b07cd8','#2ec4b6','#ff9f1c'][i];
+    ctx.fillRect(candleX-2, cky-55, 4, 22);
+    const flicker = Math.sin(frame*0.15+i)*3;
+    ctx.fillStyle = '#ff9f1c';
+    ctx.beginPath(); ctx.ellipse(candleX, cky-60+flicker, 5, 9, 0, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#ffee88';
+    ctx.beginPath(); ctx.ellipse(candleX, cky-60+flicker, 2.5, 5, 0, 0, Math.PI*2); ctx.fill();
+  }
+
+  memeText(ctx, `HAPPY BIRTHDAY ${name.toUpperCase()}!`, W/2, 50, 28);
+  memeText(ctx, 'TIME TO CELEBRATE', W/2, H-30, 20);
+}
+
+function drawGolfContent(ctx, W, H, frame, title) {
+  // Sky
+  const sky = ctx.createLinearGradient(0, 0, 0, H*0.6);
+  sky.addColorStop(0, '#87CEEB'); sky.addColorStop(1, '#e0f0ff');
+  ctx.fillStyle = sky; ctx.fillRect(0, 0, W, H);
+  // Fairway
+  ctx.fillStyle = '#2d8c3e'; ctx.fillRect(0, H*0.5, W, H*0.5);
+  ctx.fillStyle = '#34a047';
+  for (let i = 0; i < 8; i += 2) ctx.fillRect(W*(i/8), H*0.5, W/8, H*0.5);
+  // Green
+  ctx.fillStyle = '#3daa50';
+  ctx.beginPath(); ctx.ellipse(W*0.6, H*0.65, 80, 50, 0, 0, Math.PI*2); ctx.fill();
+  // Flag
+  const flagBob = Math.sin(frame*0.04)*2;
+  ctx.strokeStyle = '#fff'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(W*0.6, H*0.65); ctx.lineTo(W*0.6, H*0.35+flagBob); ctx.stroke();
+  ctx.fillStyle = '#ef4444';
+  ctx.beginPath(); ctx.moveTo(W*0.6, H*0.35+flagBob); ctx.lineTo(W*0.6+25, H*0.38+flagBob);
+  ctx.lineTo(W*0.6, H*0.41+flagBob); ctx.fill();
+  // Ball
+  ctx.fillStyle = '#fff';
+  ctx.beginPath(); ctx.arc(W*0.55, H*0.67, 5, 0, Math.PI*2); ctx.fill();
+  // Clouds
+  for (let i = 0; i < 3; i++) {
+    const cx2 = ((i*220 + frame*0.3) % (W+100)) - 50;
+    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+    ctx.beginPath(); ctx.arc(cx2, 60+i*20, 25, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(cx2+20, 55+i*20, 20, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(cx2-15, 58+i*20, 18, 0, Math.PI*2); ctx.fill();
+  }
+  memeText(ctx, title.length > 40 ? title.substring(0,40)+'...' : title, W/2, H-25, 20);
+}
+
+function drawMarketContent(ctx, W, H, frame, title, type) {
+  ctx.fillStyle = '#0a0a1a'; ctx.fillRect(0, 0, W, H);
+  // Grid
+  ctx.strokeStyle = 'rgba(255,255,255,0.05)'; ctx.lineWidth = 1;
+  for (let i = 0; i < 20; i++) {
+    ctx.beginPath(); ctx.moveTo(W*(i/20), 0); ctx.lineTo(W*(i/20), H); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0, H*(i/20)); ctx.lineTo(W, H*(i/20)); ctx.stroke();
+  }
+  // Chart line
+  ctx.strokeStyle = type === 'crypto' ? '#f7931a' : '#22c55e';
+  ctx.lineWidth = 3; ctx.beginPath();
+  const points = [];
+  for (let i = 0; i <= 40; i++) {
+    const x = W*0.05 + (W*0.9)*(i/40);
+    const noise = Math.sin(i*0.3)*20 + Math.sin(i*0.7)*15 + Math.cos(i*0.15)*30;
+    const trend = (i/40)*80;
+    const y = H*0.7 - trend - noise;
+    points.push({x, y});
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+  // Glow under chart
+  ctx.lineTo(W*0.95, H); ctx.lineTo(W*0.05, H); ctx.closePath();
+  const chartGlow = ctx.createLinearGradient(0, H*0.2, 0, H);
+  chartGlow.addColorStop(0, type === 'crypto' ? 'rgba(247,147,26,0.2)' : 'rgba(34,197,94,0.2)');
+  chartGlow.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = chartGlow; ctx.fill();
+  // Current price dot
+  const last = points[points.length-1];
+  ctx.fillStyle = type === 'crypto' ? '#f7931a' : '#22c55e';
+  ctx.beginPath(); ctx.arc(last.x, last.y, 6+Math.sin(frame*0.1)*2, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(last.x, last.y, 3, 0, Math.PI*2); ctx.fill();
+
+  memeText(ctx, title, W/2, 40, 22);
+  ctx.fillStyle = type === 'crypto' ? '#f7931a' : '#22c55e';
+  ctx.font = '900 36px Inter, sans-serif'; ctx.textAlign = 'center';
+  ctx.fillText(type === 'crypto' ? '$95,420' : '+8.2%', W/2, H-40);
+}
+
+function drawGamingContent(ctx, W, H, frame, title) {
+  ctx.fillStyle = '#0a0a1a'; ctx.fillRect(0, 0, W, H);
+  // Neon grid floor
+  const horizon = H*0.45;
+  ctx.strokeStyle = '#7c3aed'; ctx.lineWidth = 1;
+  for (let i = 0; i < 15; i++) {
+    const y = horizon + (H-horizon)*(i/14);
+    const spread = (i/14)*W;
+    ctx.globalAlpha = 0.3+i*0.04;
+    ctx.beginPath(); ctx.moveTo(W/2-spread, y); ctx.lineTo(W/2+spread, y); ctx.stroke();
+  }
+  for (let i = 0; i < 12; i++) {
+    const x = W/2 + (i-6)*40;
+    ctx.beginPath(); ctx.moveTo(W/2, horizon); ctx.lineTo(x, H); ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+  // Sun
+  const sunGrad = ctx.createLinearGradient(0, horizon-80, 0, horizon);
+  sunGrad.addColorStop(0, '#ff6b35'); sunGrad.addColorStop(1, '#ff9f1c');
+  ctx.fillStyle = sunGrad;
+  ctx.beginPath(); ctx.arc(W/2, horizon, 60, Math.PI, 0); ctx.fill();
+  // Sun lines
+  ctx.fillStyle = '#0a0a1a';
+  for (let i = 0; i < 5; i++) {
+    ctx.fillRect(W/2-60, horizon-55+i*14, 120, 4);
+  }
+  memeText(ctx, title.length > 35 ? title.substring(0,35)+'...' : title, W/2, 40, 22);
+  memeText(ctx, 'HYPE INCOMING', W/2, H-25, 20);
+}
+
+function drawGenericContent(ctx, W, H, frame, title, interest) {
+  const grad = ctx.createLinearGradient(0, 0, W, H);
+  grad.addColorStop(0, '#1a1a2e'); grad.addColorStop(0.5, '#16213e'); grad.addColorStop(1, '#0f3460');
+  ctx.fillStyle = grad; ctx.fillRect(0, 0, W, H);
+  // Floating shapes
+  for (let i = 0; i < 8; i++) {
+    const cx2 = W/2 + Math.sin(frame*0.02+i*0.8)*100;
+    const cy2 = H/2 + Math.cos(frame*0.015+i*1.1)*60;
+    const r = 20 + Math.sin(i)*10;
+    ctx.fillStyle = `rgba(255,107,53,${0.05+Math.sin(frame*0.03+i)*0.03})`;
+    ctx.beginPath(); ctx.arc(cx2, cy2, r, 0, Math.PI*2); ctx.fill();
+  }
+  // Interest label
+  const intObj = INTERESTS.find(x => x.id === interest);
+  const label = intObj ? intObj.label : interest;
+  ctx.fillStyle = 'rgba(255,255,255,0.08)';
+  ctx.font = '900 72px Inter, sans-serif'; ctx.textAlign = 'center';
+  ctx.fillText(label.toUpperCase(), W/2, H/2+20);
+
+  memeText(ctx, title.length > 40 ? title.substring(0,40)+'...' : title, W/2, H-30, 20);
+}
+
+// ===== HELPERS =====
 function roundRect(ctx, x, y, w, h, r) {
-  ctx.beginPath();
-  ctx.moveTo(x + r, y);
-  ctx.lineTo(x + w - r, y);
-  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-  ctx.lineTo(x + w, y + h - r);
-  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-  ctx.lineTo(x + r, y + h);
-  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-  ctx.lineTo(x, y + r);
-  ctx.quadraticCurveTo(x, y, x + r, y);
-  ctx.closePath();
+  ctx.beginPath(); ctx.moveTo(x+r, y); ctx.lineTo(x+w-r, y);
+  ctx.quadraticCurveTo(x+w, y, x+w, y+r); ctx.lineTo(x+w, y+h-r);
+  ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h); ctx.lineTo(x+r, y+h);
+  ctx.quadraticCurveTo(x, y+h, x, y+h-r); ctx.lineTo(x, y+r);
+  ctx.quadraticCurveTo(x, y, x+r, y); ctx.closePath();
 }
 
 function memeText(ctx, text, x, y, size) {
-  ctx.font = `900 ${size}px Inter, sans-serif`;
-  ctx.textAlign = 'center';
-  ctx.fillStyle = '#fff';
-  ctx.strokeStyle = '#000';
-  ctx.lineWidth = size * 0.15;
-  ctx.lineCap = 'round';
-  ctx.lineJoin = 'round';
-  ctx.strokeText(text, x, y);
-  ctx.fillText(text, x, y);
+  ctx.font = `900 ${size}px Inter, sans-serif`; ctx.textAlign = 'center';
+  ctx.fillStyle = '#fff'; ctx.strokeStyle = '#000';
+  ctx.lineWidth = size*0.15; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  ctx.strokeText(text, x, y); ctx.fillText(text, x, y);
 }
 
-function drawChipStack(ctx, x, y, offset) {
-  const colors = ['#cc3333', '#3333cc', '#33cc33', '#ffcc00'];
-  for (let i = 0; i < 4; i++) {
-    ctx.fillStyle = colors[i];
-    ctx.beginPath();
-    ctx.ellipse(x, y - i * 6, 16, 8, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.strokeStyle = 'rgba(255,255,255,0.3)';
-    ctx.lineWidth = 1;
-    ctx.stroke();
+function eventTypeIcon(type) {
+  const icons = {sports:'&#9917;',release:'&#127381;',market:'&#128200;',birthday:'&#127874;',
+    seasonal:'&#127809;',event:'&#127915;',deal:'&#9992;'};
+  return icons[type] || '&#9889;';
+}
+
+function formatBday(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('en-US', {month:'short', day:'numeric'});
+}
+
+function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+function savePersist() { localStorage.setItem('spark_friends', JSON.stringify(friends)); }
+
+// ===== CONTACTS API =====
+async function pickContact() {
+  if ('contacts' in navigator && 'ContactsManager' in window) {
+    try {
+      const props = ['name', 'tel'];
+      const opts = {multiple: false};
+      const contacts = await navigator.contacts.select(props, opts);
+      if (contacts.length > 0) {
+        const c = contacts[0];
+        document.getElementById('inp-name').value = c.name?.[0] || '';
+        document.getElementById('inp-phone').value = c.tel?.[0] || '';
+        showToast('Contact imported!');
+      }
+    } catch (e) {
+      showToast('Contact picker cancelled');
+    }
+  } else {
+    showToast('Contacts API not available — add manually');
   }
 }
 
-function drawCard(ctx, x, y, w, h, value, suit, rotation) {
-  ctx.save();
-  ctx.translate(x + w/2, y + h/2);
-  ctx.rotate(rotation);
-  // Card bg
-  ctx.fillStyle = '#fff';
-  roundRect(ctx, -w/2, -h/2, w, h, 5);
-  ctx.fill();
-  ctx.strokeStyle = '#ccc';
-  ctx.lineWidth = 1;
-  roundRect(ctx, -w/2, -h/2, w, h, 5);
-  ctx.stroke();
-  // Value + suit
-  const suitColor = (suit === 'hearts' || suit === 'diamonds') ? '#cc0000' : '#000';
-  ctx.fillStyle = suitColor;
-  ctx.font = '900 22px Inter, sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText(value, 0, -5);
-  const suitChar = {hearts: '\u2665', diamonds: '\u2666', clubs: '\u2663', spades: '\u2660'}[suit];
-  ctx.font = '18px serif';
-  ctx.fillText(suitChar, 0, 20);
-  ctx.restore();
+// ===== FRIEND MANAGEMENT =====
+function openModal() {
+  if (friends.length >= 15) { showToast('Max 15 friends'); return; }
+  document.getElementById('addModal').classList.remove('hidden');
+  renderInterestPicker();
 }
 
-// ---- Init all canvases ----
-function initCanvases() {
-  drawBearsGif('gif-bears', true);
-  drawBourbonGif('gif-bourbon', true);
-  drawSoccerGif('gif-soccer', true);
-  drawMemeWisconsin('meme-wisconsin');
-  drawMemePoker('meme-poker');
-  drawMemePizza('meme-pizza');
-  drawNudgeThumb('nudge-bears', 'bears');
-  drawNudgeThumb('nudge-bourbon', 'bourbon');
-  drawNudgeThumb('nudge-soccer', 'soccer');
-  drawNudgeThumb('nudge-bday', 'bday');
+function closeModal() {
+  document.getElementById('addModal').classList.add('hidden');
+  clearForm();
 }
 
-// ---- App logic ----
+function renderInterestPicker() {
+  document.getElementById('interestPicker').innerHTML = INTERESTS.map(i =>
+    `<div class="interest-pick" data-id="${i.id}" onclick="toggleInterest(this)">${i.label}</div>`
+  ).join('');
+}
+
+function toggleInterest(el) { el.classList.toggle('selected'); }
+
+function clearForm() {
+  document.getElementById('inp-name').value = '';
+  document.getElementById('inp-phone').value = '';
+  document.getElementById('inp-bday').value = '';
+  document.getElementById('inp-custom').value = '';
+  document.querySelectorAll('.interest-pick').forEach(e => e.classList.remove('selected'));
+}
+
+function saveFriend() {
+  const name = document.getElementById('inp-name').value.trim();
+  if (!name) { showToast('Enter a name'); return; }
+  if (friends.length >= 15) { showToast('Max 15 friends'); return; }
+
+  const interests = Array.from(document.querySelectorAll('.interest-pick.selected')).map(e => e.dataset.id);
+  const custom = document.getElementById('inp-custom').value.trim();
+  const customInterests = custom ? custom.split(',').map(s => s.trim()).filter(Boolean) : [];
+
+  friends.push({
+    name,
+    phone: document.getElementById('inp-phone').value.trim(),
+    birthday: document.getElementById('inp-bday').value,
+    interests,
+    customInterests,
+  });
+  savePersist();
+  closeModal();
+  render();
+  showToast(`${name} added!`);
+}
+
+function removeFriend(idx) {
+  const name = friends[idx].name;
+  friends.splice(idx, 1);
+  savePersist();
+  render();
+  showToast(`${name} removed`);
+}
+
+function sendTo(name) {
+  showToast(`Opening iMessage to ${name}`);
+  if (navigator.vibrate) navigator.vibrate([10,50,10]);
+}
+
+// ===== NAV =====
 function switchTab(view, btn) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.getElementById('view-' + view).classList.add('active');
   btn.classList.add('active');
+  if (view === 'feed') renderFeed();
   if (navigator.vibrate) navigator.vibrate(10);
 }
 
 function showToast(msg) {
   const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
+  t.textContent = msg; t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 1800);
 }
 
-function sendAmmo(name) {
-  showToast(`Opening iMessage to ${name}`);
-  if (navigator.vibrate) navigator.vibrate([10, 50, 10]);
-}
-
-function sendJoke(name) {
-  showToast(`Sent to ${name}`);
-  if (navigator.vibrate) navigator.vibrate([10, 50, 10]);
-}
-
-function sendNudge(card, name) {
-  if (card.classList.contains('sent')) return;
-  card.classList.add('sent');
-  showToast(`Sent to ${name}`);
-  if (navigator.vibrate) navigator.vibrate([10, 50, 10]);
-}
-
-function refreshJoke(btn) {
-  const card = btn.closest('.joke-card');
-  card.style.opacity = '0.5';
-  setTimeout(() => { card.style.opacity = '1'; showToast('New version generated'); }, 600);
-}
-
-function toggleTag(el) { el.classList.toggle('selected'); }
-
-function openModal() { document.getElementById('addModal').classList.remove('hidden'); }
-function closeModal() { document.getElementById('addModal').classList.add('hidden'); }
-
-function addFriend() {
-  const name = document.getElementById('friendName').value.trim();
-  if (!name) { showToast('Enter a name'); return; }
-  showToast(`${name} added`);
-  closeModal();
-  document.getElementById('friendName').value = '';
-  document.getElementById('friendPhone').value = '';
-  document.getElementById('friendInterests').value = '';
-  document.getElementById('friendMemories').value = '';
-}
-
-window.addEventListener('DOMContentLoaded', initCanvases);
+// Init
+render();
 </script>
-
 </body>
 </html>
