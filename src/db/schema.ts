@@ -1,4 +1,4 @@
-import { pgTable, uuid, varchar, date, timestamp, text, integer } from "drizzle-orm/pg-core";
+import { pgTable, uuid, varchar, date, timestamp, text, boolean, jsonb } from "drizzle-orm/pg-core";
 
 export const friends = pgTable("friends", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -17,12 +17,13 @@ export const interests = pgTable("interests", {
   category: varchar("category", { length: 50 }),
 });
 
-export const events = pgTable("events", {
+export const listeners = pgTable("listeners", {
   id: uuid("id").defaultRandom().primaryKey(),
-  title: varchar("title", { length: 255 }).notNull(),
-  detail: text("detail"),
+  source: varchar("source", { length: 50 }).notNull(),
+  sourceId: varchar("source_id", { length: 100 }).notNull(),
+  label: varchar("label", { length: 200 }).notNull(),
   category: varchar("category", { length: 50 }).notNull(),
-  type: varchar("type", { length: 30 }).notNull(),
-  time: varchar("time", { length: 50 }),
+  config: jsonb("config"),
+  active: boolean("active").default(true).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
