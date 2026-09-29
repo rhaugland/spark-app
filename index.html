@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Spark</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap');
 
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
@@ -32,14 +32,12 @@
     overflow-x: hidden;
   }
 
-  /* Top bar */
   .top-bar {
     position: fixed; top: 0; left: 0; right: 0; z-index: 100;
     padding: 12px 20px;
     padding-top: max(12px, env(safe-area-inset-top));
     background: rgba(10,10,10,0.85);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
     border-bottom: 1px solid var(--border);
   }
   .top-bar h1 {
@@ -49,58 +47,40 @@
   }
   .top-bar p { font-size: 11px; color: var(--text2); margin-top: 2px; }
 
-  /* Tab bar */
   .tab-bar {
     position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
-    display: flex;
-    padding: 8px 12px;
+    display: flex; padding: 8px 12px;
     padding-bottom: max(8px, env(safe-area-inset-bottom));
     background: rgba(10,10,10,0.92);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-top: 1px solid var(--border);
-    gap: 4px;
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border); gap: 4px;
   }
   .tab {
     flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;
     padding: 8px 4px; border-radius: 12px;
     background: none; border: none; color: var(--text2);
-    font-size: 10px; font-weight: 500; cursor: pointer;
-    transition: all 0.2s;
+    font-size: 10px; font-weight: 500; cursor: pointer; transition: all 0.2s;
   }
   .tab.active { color: var(--accent); background: rgba(255,107,53,0.1); }
   .tab svg { width: 22px; height: 22px; }
 
-  /* Content */
-  .content {
-    padding-top: 72px;
-    padding-bottom: 90px;
-    min-height: 100dvh;
-  }
+  .content { padding-top: 72px; padding-bottom: 90px; min-height: 100dvh; }
   .view { display: none; padding: 16px; }
   .view.active { display: block; }
 
-  /* Section headers */
   .section-label {
     font-size: 11px; font-weight: 600; text-transform: uppercase;
     letter-spacing: 1.2px; color: var(--text2); margin: 20px 0 12px; padding-left: 4px;
   }
   .section-label:first-child { margin-top: 4px; }
 
-  /* ============ TAB 1: CONTEXTUAL AMMO ============ */
   .moment-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 16px;
-    margin-bottom: 12px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 16px; margin-bottom: 12px;
     transition: transform 0.15s;
   }
   .moment-card:active { transform: scale(0.98); }
-
-  .moment-header {
-    display: flex; align-items: center; gap: 12px; margin-bottom: 12px;
-  }
+  .moment-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
   .moment-avatar {
     width: 42px; height: 42px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
@@ -108,36 +88,21 @@
   }
   .moment-meta h3 { font-size: 15px; font-weight: 600; }
   .moment-meta p { font-size: 12px; color: var(--text2); margin-top: 2px; }
-
   .moment-context {
-    background: var(--surface2);
-    border-radius: 12px;
-    padding: 14px;
-    margin-bottom: 12px;
-    font-size: 13px;
-    line-height: 1.5;
-    color: var(--text);
+    background: var(--surface2); border-radius: 12px; padding: 14px;
+    margin-bottom: 12px; font-size: 13px; line-height: 1.5;
   }
-  .moment-context .emoji { font-size: 20px; margin-right: 6px; }
 
   .moment-gif {
-    width: 100%;
-    border-radius: 12px;
-    overflow: hidden;
-    margin-bottom: 12px;
-    background: var(--surface2);
-    aspect-ratio: 16/10;
-    display: flex; align-items: center; justify-content: center;
-    position: relative;
+    width: 100%; border-radius: 12px; overflow: hidden;
+    margin-bottom: 12px; position: relative;
   }
-  .moment-gif .gif-placeholder {
-    font-size: 48px;
-    opacity: 0.6;
+  .moment-gif canvas {
+    width: 100%; display: block; border-radius: 12px;
   }
   .moment-gif .gif-label {
     position: absolute; bottom: 8px; right: 8px;
-    background: rgba(0,0,0,0.7);
-    color: #fff;
+    background: rgba(0,0,0,0.7); color: #fff;
     font-size: 10px; font-weight: 600;
     padding: 4px 8px; border-radius: 6px;
     text-transform: uppercase; letter-spacing: 0.5px;
@@ -154,41 +119,27 @@
   .send-btn:active { transform: scale(0.97); opacity: 0.9; }
   .send-btn svg { width: 16px; height: 16px; }
 
-  /* Live score ticker */
   .ticker {
     display: flex; gap: 10px; overflow-x: auto;
-    padding-bottom: 4px; margin-bottom: 8px;
-    scrollbar-width: none;
+    padding-bottom: 4px; margin-bottom: 8px; scrollbar-width: none;
   }
   .ticker::-webkit-scrollbar { display: none; }
   .ticker-item {
-    flex-shrink: 0;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 10px 14px;
-    font-size: 12px;
+    flex-shrink: 0; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 10px 14px; font-size: 12px;
     display: flex; align-items: center; gap: 8px;
   }
   .ticker-item .live-dot {
-    width: 6px; height: 6px; border-radius: 50%;
-    background: #ef4444;
+    width: 6px; height: 6px; border-radius: 50%; background: #ef4444;
     animation: pulse 1.5s infinite;
   }
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
-  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
-  /* ============ TAB 2: INSIDE JOKES ============ */
+  /* Jokes tab */
   .memory-upload {
-    border: 2px dashed var(--border);
-    border-radius: var(--radius);
-    padding: 32px 16px;
-    text-align: center;
-    margin-bottom: 16px;
-    cursor: pointer;
-    transition: border-color 0.2s;
+    border: 2px dashed var(--border); border-radius: var(--radius);
+    padding: 32px 16px; text-align: center; margin-bottom: 16px;
+    cursor: pointer; transition: border-color 0.2s;
   }
   .memory-upload:active { border-color: var(--accent); }
   .memory-upload svg { width: 32px; height: 32px; color: var(--text2); margin-bottom: 8px; }
@@ -196,141 +147,68 @@
   .memory-upload .highlight { color: var(--accent); font-weight: 600; }
 
   .joke-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    overflow: hidden;
-    margin-bottom: 12px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); overflow: hidden; margin-bottom: 12px;
   }
-  .joke-image {
-    width: 100%;
-    aspect-ratio: 1;
-    background: var(--surface2);
-    display: flex; align-items: center; justify-content: center;
-    position: relative;
-    overflow: hidden;
-  }
-  .joke-image .meme-bg {
-    font-size: 80px;
-    opacity: 0.3;
-  }
-  .meme-text-top, .meme-text-bottom {
-    position: absolute;
-    left: 8px; right: 8px;
-    text-align: center;
-    font-size: 18px; font-weight: 900;
-    color: #fff;
-    text-shadow: 2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000;
-    text-transform: uppercase;
-    line-height: 1.2;
-  }
-  .meme-text-top { top: 12px; }
-  .meme-text-bottom { bottom: 12px; }
+  .joke-image { width: 100%; position: relative; overflow: hidden; }
+  .joke-image canvas { width: 100%; display: block; }
 
   .joke-footer {
-    padding: 12px 16px;
-    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px; display: flex; align-items: center; justify-content: space-between;
   }
-  .joke-footer .context {
-    font-size: 12px; color: var(--text2);
-  }
-  .joke-actions {
-    display: flex; gap: 8px;
-  }
+  .joke-footer .context { font-size: 12px; color: var(--text2); }
+  .joke-actions { display: flex; gap: 8px; }
   .joke-action-btn {
-    width: 36px; height: 36px;
-    border-radius: 50%;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    color: var(--text2);
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer;
-    transition: all 0.15s;
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text2); display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.15s;
   }
   .joke-action-btn:active { background: var(--accent); color: #fff; border-color: var(--accent); }
   .joke-action-btn svg { width: 16px; height: 16px; }
 
-  /* Tags */
-  .friend-tags {
-    display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px;
-  }
+  .friend-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
   .friend-tag {
-    padding: 8px 14px;
-    border-radius: 20px;
-    font-size: 13px; font-weight: 500;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    color: var(--text2);
-    cursor: pointer;
-    transition: all 0.15s;
+    padding: 8px 14px; border-radius: 20px; font-size: 13px; font-weight: 500;
+    border: 1px solid var(--border); background: var(--surface);
+    color: var(--text2); cursor: pointer; transition: all 0.15s;
   }
-  .friend-tag.selected {
-    background: rgba(255,107,53,0.15);
-    border-color: var(--accent);
-    color: var(--accent);
-  }
+  .friend-tag.selected { background: rgba(255,107,53,0.15); border-color: var(--accent); color: var(--accent); }
 
-  /* ============ TAB 3: NUDGES ============ */
-  .nudge-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 16px;
-  }
+  /* Nudges */
+  .nudge-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
   .nudge-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 16px 14px;
-    cursor: pointer;
-    transition: all 0.15s;
-    position: relative;
-    overflow: hidden;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 0; cursor: pointer;
+    transition: all 0.15s; position: relative; overflow: hidden;
   }
   .nudge-card:active { transform: scale(0.96); }
-  .nudge-card .nudge-emoji { font-size: 28px; margin-bottom: 8px; }
+  .nudge-thumb { width: 100%; height: 90px; overflow: hidden; }
+  .nudge-thumb canvas { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .nudge-body { padding: 12px 14px; }
   .nudge-card .nudge-to {
     font-size: 11px; color: var(--text2); margin-bottom: 4px;
     display: flex; align-items: center; gap: 4px;
   }
-  .nudge-card .nudge-to .dot {
-    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
-  }
-  .nudge-card .nudge-msg {
-    font-size: 13px; font-weight: 500; line-height: 1.4;
-  }
-  .nudge-card .nudge-reason {
-    font-size: 11px; color: var(--text2); margin-top: 6px;
-    font-style: italic;
-  }
-  .nudge-card.sent {
-    opacity: 0.5;
-  }
+  .nudge-card .nudge-to .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .nudge-card .nudge-msg { font-size: 13px; font-weight: 500; line-height: 1.4; }
+  .nudge-card .nudge-reason { font-size: 11px; color: var(--text2); margin-top: 6px; font-style: italic; }
+  .nudge-card.sent { opacity: 0.5; }
   .nudge-card.sent::after {
-    content: 'Sent';
-    position: absolute; top: 10px; right: 10px;
-    font-size: 10px; font-weight: 600;
-    color: var(--green);
-    background: rgba(46,196,182,0.15);
-    padding: 3px 8px; border-radius: 6px;
+    content: 'Sent'; position: absolute; top: 10px; right: 10px;
+    font-size: 10px; font-weight: 600; color: var(--green);
+    background: rgba(46,196,182,0.15); padding: 3px 8px; border-radius: 6px;
   }
 
-  /* Streak section */
   .streak-bar {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 16px;
-    margin-bottom: 16px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 16px; margin-bottom: 16px;
     display: flex; align-items: center; gap: 14px;
   }
   .streak-ring {
-    width: 52px; height: 52px; border-radius: 50%;
-    border: 3px solid var(--border);
+    width: 52px; height: 52px; border-radius: 50%; border: 3px solid var(--border);
     display: flex; align-items: center; justify-content: center;
-    font-size: 18px; font-weight: 700;
-    position: relative;
-    flex-shrink: 0;
+    font-size: 18px; font-weight: 700; flex-shrink: 0;
   }
   .streak-ring.hot { border-color: var(--accent); color: var(--accent); }
   .streak-info h3 { font-size: 14px; font-weight: 600; }
@@ -338,11 +216,8 @@
 
   .friend-row {
     display: flex; align-items: center; gap: 12px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 14px 16px;
-    margin-bottom: 8px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 14px 16px; margin-bottom: 8px;
   }
   .friend-row .fr-avatar {
     width: 38px; height: 38px; border-radius: 50%;
@@ -352,167 +227,81 @@
   .friend-row .fr-info { flex: 1; }
   .friend-row .fr-info h4 { font-size: 14px; font-weight: 500; }
   .friend-row .fr-info p { font-size: 11px; color: var(--text2); margin-top: 2px; }
-  .friend-row .fr-days {
-    font-size: 20px; font-weight: 700;
-    color: var(--text2);
-  }
+  .friend-row .fr-days { font-size: 20px; font-weight: 700; color: var(--text2); }
   .friend-row .fr-days.warn { color: var(--accent); }
   .friend-row .fr-days.danger { color: #ef4444; }
 
-  /* Toast */
   .toast {
-    position: fixed;
-    top: 50%; left: 50%;
+    position: fixed; top: 50%; left: 50%;
     transform: translate(-50%, -50%) scale(0.8);
-    background: rgba(0,0,0,0.9);
-    color: #fff;
-    padding: 16px 28px;
-    border-radius: 16px;
-    font-size: 15px; font-weight: 600;
-    z-index: 200;
-    opacity: 0;
-    pointer-events: none;
+    background: rgba(0,0,0,0.9); color: #fff; padding: 16px 28px;
+    border-radius: 16px; font-size: 15px; font-weight: 600;
+    z-index: 200; opacity: 0; pointer-events: none;
     transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     text-align: center;
   }
-  .toast.show {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-  }
+  .toast.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 
-  /* Onboarding modal */
   .modal-overlay {
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,0.8);
-    z-index: 300;
-    display: flex; align-items: flex-end; justify-content: center;
+    position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+    z-index: 300; display: flex; align-items: flex-end; justify-content: center;
   }
   .modal-overlay.hidden { display: none; }
   .modal {
-    background: var(--surface);
-    border-radius: 24px 24px 0 0;
-    padding: 28px 20px;
-    padding-bottom: max(28px, env(safe-area-inset-bottom));
-    width: 100%; max-width: 420px;
-    max-height: 85dvh;
-    overflow-y: auto;
+    background: var(--surface); border-radius: 24px 24px 0 0;
+    padding: 28px 20px; padding-bottom: max(28px, env(safe-area-inset-bottom));
+    width: 100%; max-width: 420px; max-height: 85dvh; overflow-y: auto;
   }
-  .modal h2 {
-    font-size: 20px; font-weight: 700; margin-bottom: 6px;
-  }
+  .modal h2 { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
   .modal .subtitle { font-size: 13px; color: var(--text2); margin-bottom: 20px; line-height: 1.5; }
-
   .input-group { margin-bottom: 16px; }
   .input-group label {
     font-size: 12px; font-weight: 600; color: var(--text2);
-    text-transform: uppercase; letter-spacing: 0.5px;
-    display: block; margin-bottom: 6px;
+    text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;
   }
   .input-group input, .input-group textarea {
-    width: 100%; padding: 12px 14px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    color: var(--text);
-    font-size: 14px;
-    font-family: inherit;
-    outline: none;
+    width: 100%; padding: 12px 14px; background: var(--surface2);
+    border: 1px solid var(--border); border-radius: 12px;
+    color: var(--text); font-size: 14px; font-family: inherit; outline: none;
     transition: border-color 0.2s;
   }
-  .input-group input:focus, .input-group textarea:focus {
-    border-color: var(--accent);
-  }
+  .input-group input:focus, .input-group textarea:focus { border-color: var(--accent); }
   .input-group textarea { resize: none; min-height: 60px; }
-
-  .friend-chip-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
-  .friend-chip {
-    display: flex; align-items: center; gap: 6px;
-    padding: 6px 12px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    font-size: 13px;
-  }
-  .friend-chip .remove {
-    width: 18px; height: 18px;
-    border-radius: 50%;
-    background: var(--border);
-    border: none;
-    color: var(--text2);
-    font-size: 12px;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-  }
-
   .modal-btn {
-    width: 100%; padding: 14px;
-    border: none; border-radius: 12px;
-    font-size: 15px; font-weight: 600;
-    cursor: pointer; transition: all 0.15s;
+    width: 100%; padding: 14px; border: none; border-radius: 12px;
+    font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.15s;
   }
-  .modal-btn.primary {
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    color: #fff;
-  }
-  .modal-btn.secondary {
-    background: var(--surface2);
-    color: var(--text);
-    margin-top: 8px;
-  }
+  .modal-btn.primary { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; }
+  .modal-btn.secondary { background: var(--surface2); color: var(--text); margin-top: 8px; }
 
-  /* Animations */
-  @keyframes slideUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  .animate-in {
-    animation: slideUp 0.35s ease-out both;
-  }
-  .delay-1 { animation-delay: 0.05s; }
-  .delay-2 { animation-delay: 0.1s; }
-  .delay-3 { animation-delay: 0.15s; }
-  .delay-4 { animation-delay: 0.2s; }
-  .delay-5 { animation-delay: 0.25s; }
+  @keyframes slideUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+  .animate-in { animation: slideUp 0.35s ease-out both; }
+  .delay-1{animation-delay:.05s} .delay-2{animation-delay:.1s} .delay-3{animation-delay:.15s}
+  .delay-4{animation-delay:.2s} .delay-5{animation-delay:.25s}
 </style>
 </head>
 <body>
 
-<!-- Top bar -->
 <div class="top-bar">
   <h1>Spark</h1>
   <p>3 friends need a text today</p>
 </div>
 
-<!-- Toast -->
 <div class="toast" id="toast"></div>
 
-<!-- Add Friend Modal -->
 <div class="modal-overlay hidden" id="addModal">
   <div class="modal">
     <h2>Add a friend</h2>
     <p class="subtitle">Tell Spark about them so it can find the right moments to reach out.</p>
-    <div class="input-group">
-      <label>Name</label>
-      <input type="text" id="friendName" placeholder="Dave">
-    </div>
-    <div class="input-group">
-      <label>Phone (optional)</label>
-      <input type="tel" id="friendPhone" placeholder="+1 555 123 4567">
-    </div>
-    <div class="input-group">
-      <label>What are they into?</label>
-      <textarea id="friendInterests" placeholder="Bears fan, loves craft beer, just got a new dog..."></textarea>
-    </div>
-    <div class="input-group">
-      <label>Inside jokes / shared memories</label>
-      <textarea id="friendMemories" placeholder="That time we got lost in Wisconsin, the 'legendary' poker hand..."></textarea>
-    </div>
+    <div class="input-group"><label>Name</label><input type="text" id="friendName" placeholder="Dave"></div>
+    <div class="input-group"><label>Phone (optional)</label><input type="tel" id="friendPhone" placeholder="+1 555 123 4567"></div>
+    <div class="input-group"><label>What are they into?</label><textarea id="friendInterests" placeholder="Bears fan, loves craft beer, just got a new dog..."></textarea></div>
+    <div class="input-group"><label>Inside jokes / shared memories</label><textarea id="friendMemories" placeholder="That time we got lost in Wisconsin, the 'legendary' poker hand..."></textarea></div>
     <button class="modal-btn primary" onclick="addFriend()">Add Friend</button>
     <button class="modal-btn secondary" onclick="closeModal()">Cancel</button>
   </div>
 </div>
 
-<!-- Content -->
 <div class="content">
 
   <!-- TAB 1: Contextual Ammo -->
@@ -529,20 +318,15 @@
 
     <div class="moment-card animate-in delay-1">
       <div class="moment-header">
-        <div class="moment-avatar" style="background: rgba(255,107,53,0.15); color: var(--accent);">D</div>
-        <div class="moment-meta">
-          <h3>Dave</h3>
-          <p>Bears fan &middot; Last texted 5 days ago</p>
-        </div>
+        <div class="moment-avatar" style="background:rgba(255,107,53,0.15);color:var(--accent);">D</div>
+        <div class="moment-meta"><h3>Dave</h3><p>Bears fan &middot; Last texted 5 days ago</p></div>
       </div>
-      <div class="moment-context">
-        <span class="emoji">🏈</span> Bears lost to the Packers again (17-24). Dave's probably fuming. Perfect time to twist the knife.
-      </div>
+      <div class="moment-context">Bears lost to the Packers again (17-24). Dave's probably fuming. Perfect time to twist the knife.</div>
       <div class="moment-gif">
-        <div class="gif-placeholder">🐻💀</div>
+        <canvas id="gif-bears" width="640" height="400"></canvas>
         <div class="gif-label">Custom GIF</div>
       </div>
-      <button class="send-btn" onclick="sendAmmo('Dave', 'Bears L')">
+      <button class="send-btn" onclick="sendAmmo('Dave','Bears L')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
         Send to Dave via iMessage
       </button>
@@ -550,20 +334,15 @@
 
     <div class="moment-card animate-in delay-2">
       <div class="moment-header">
-        <div class="moment-avatar" style="background: rgba(78,168,222,0.15); color: var(--blue);">M</div>
-        <div class="moment-meta">
-          <h3>Mike</h3>
-          <p>Bourbon guy &middot; Last texted 12 days ago</p>
-        </div>
+        <div class="moment-avatar" style="background:rgba(78,168,222,0.15);color:var(--blue);">M</div>
+        <div class="moment-meta"><h3>Mike</h3><p>Bourbon guy &middot; Last texted 12 days ago</p></div>
       </div>
-      <div class="moment-context">
-        <span class="emoji">🥃</span> Buffalo Trace dropped a limited single barrel today. Mike hunts these. He either already knows or needs to hear about it from you first.
-      </div>
+      <div class="moment-context">Buffalo Trace dropped a limited single barrel today. Mike hunts these. He either already knows or needs to hear about it from you first.</div>
       <div class="moment-gif">
-        <div class="gif-placeholder">🥃🔥</div>
+        <canvas id="gif-bourbon" width="640" height="400"></canvas>
         <div class="gif-label">Custom GIF</div>
       </div>
-      <button class="send-btn" onclick="sendAmmo('Mike', 'bourbon drop')">
+      <button class="send-btn" onclick="sendAmmo('Mike','bourbon drop')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
         Send to Mike via iMessage
       </button>
@@ -571,20 +350,15 @@
 
     <div class="moment-card animate-in delay-3">
       <div class="moment-header">
-        <div class="moment-avatar" style="background: rgba(176,124,216,0.15); color: var(--purple);">J</div>
-        <div class="moment-meta">
-          <h3>Jake</h3>
-          <p>New dad &middot; Last texted 21 days ago</p>
-        </div>
+        <div class="moment-avatar" style="background:rgba(176,124,216,0.15);color:var(--purple);">J</div>
+        <div class="moment-meta"><h3>Jake</h3><p>New dad &middot; Last texted 21 days ago</p></div>
       </div>
-      <div class="moment-context">
-        <span class="emoji">⚽</span> Jake's kid had their first soccer game yesterday (Saturday league). Ask how it went — he'll love that you remembered.
-      </div>
+      <div class="moment-context">Jake's kid had their first soccer game yesterday (Saturday league). Ask how it went -- he'll love that you remembered.</div>
       <div class="moment-gif">
-        <div class="gif-placeholder">⚽👶</div>
+        <canvas id="gif-soccer" width="640" height="400"></canvas>
         <div class="gif-label">Custom GIF</div>
       </div>
-      <button class="send-btn" onclick="sendAmmo('Jake', 'soccer game')">
+      <button class="send-btn" onclick="sendAmmo('Jake','soccer game')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
         Send to Jake via iMessage
       </button>
@@ -600,7 +374,6 @@
       <div class="friend-tag" onclick="toggleTag(this)">Jake</div>
       <div class="friend-tag" onclick="toggleTag(this)">Group chat</div>
     </div>
-
     <div class="memory-upload" onclick="document.getElementById('photoInput').click()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
       <p>Drop photos & memories here<br><span class="highlight">Spark turns them into sendable content</span></p>
@@ -610,58 +383,34 @@
     <div class="section-label">Generated from your memories</div>
 
     <div class="joke-card animate-in delay-1">
-      <div class="joke-image">
-        <div class="meme-bg">🗺️</div>
-        <div class="meme-text-top">When Dave says he knows a shortcut</div>
-        <div class="meme-text-bottom">3 hours later in rural Wisconsin</div>
-      </div>
+      <div class="joke-image"><canvas id="meme-wisconsin" width="640" height="640"></canvas></div>
       <div class="joke-footer">
         <span class="context">From: "got lost in WI" memory</span>
         <div class="joke-actions">
-          <button class="joke-action-btn" onclick="refreshJoke(this)" title="Regenerate">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15"/></svg>
-          </button>
-          <button class="joke-action-btn" onclick="sendJoke('Dave', 'Wisconsin')" title="Send">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
-          </button>
+          <button class="joke-action-btn" onclick="refreshJoke(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15"/></svg></button>
+          <button class="joke-action-btn" onclick="sendJoke('Dave','Wisconsin')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></button>
         </div>
       </div>
     </div>
 
     <div class="joke-card animate-in delay-2">
-      <div class="joke-image">
-        <div class="meme-bg">🃏</div>
-        <div class="meme-text-top">Mike: "I'm all in"</div>
-        <div class="meme-text-bottom">Narrator: he had a pair of 3s</div>
-      </div>
+      <div class="joke-image"><canvas id="meme-poker" width="640" height="640"></canvas></div>
       <div class="joke-footer">
         <span class="context">From: "legendary poker hand"</span>
         <div class="joke-actions">
-          <button class="joke-action-btn" onclick="refreshJoke(this)" title="Regenerate">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15"/></svg>
-          </button>
-          <button class="joke-action-btn" onclick="sendJoke('Mike', 'poker')" title="Send">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
-          </button>
+          <button class="joke-action-btn" onclick="refreshJoke(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15"/></svg></button>
+          <button class="joke-action-btn" onclick="sendJoke('Mike','poker')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></button>
         </div>
       </div>
     </div>
 
     <div class="joke-card animate-in delay-3">
-      <div class="joke-image">
-        <div class="meme-bg">🍕</div>
-        <div class="meme-text-top">Jake ordering "one slice"</div>
-        <div class="meme-text-bottom">4 slices later: "I wasn't even hungry"</div>
-      </div>
+      <div class="joke-image"><canvas id="meme-pizza" width="640" height="640"></canvas></div>
       <div class="joke-footer">
         <span class="context">From: group memory</span>
         <div class="joke-actions">
-          <button class="joke-action-btn" onclick="refreshJoke(this)" title="Regenerate">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15"/></svg>
-          </button>
-          <button class="joke-action-btn" onclick="sendJoke('Group', 'pizza')" title="Send">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
-          </button>
+          <button class="joke-action-btn" onclick="refreshJoke(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15"/></svg></button>
+          <button class="joke-action-btn" onclick="sendJoke('Group','pizza')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></button>
         </div>
       </div>
     </div>
@@ -669,109 +418,1066 @@
 
   <!-- TAB 3: Nudges -->
   <div class="view" id="view-nudges">
-
     <div class="streak-bar animate-in">
       <div class="streak-ring hot">7</div>
-      <div class="streak-info">
-        <h3>7-day streak</h3>
-        <p>You've reached out to someone every day this week</p>
-      </div>
+      <div class="streak-info"><h3>7-day streak</h3><p>You've reached out to someone every day this week</p></div>
     </div>
 
     <div class="section-label">One-tap sends</div>
     <div class="nudge-grid">
-      <div class="nudge-card animate-in delay-1" onclick="sendNudge(this, 'Dave')">
-        <div class="nudge-emoji">🏈💀</div>
-        <div class="nudge-to"><div class="dot" style="background: var(--accent);"></div> Dave</div>
-        <div class="nudge-msg">"That 4th quarter was criminal"</div>
-        <div class="nudge-reason">Bears lost today</div>
+      <div class="nudge-card animate-in delay-1" onclick="sendNudge(this,'Dave')">
+        <div class="nudge-thumb"><canvas id="nudge-bears" width="320" height="180"></canvas></div>
+        <div class="nudge-body">
+          <div class="nudge-to"><div class="dot" style="background:var(--accent);"></div> Dave</div>
+          <div class="nudge-msg">"That 4th quarter was criminal"</div>
+          <div class="nudge-reason">Bears lost today</div>
+        </div>
       </div>
-      <div class="nudge-card animate-in delay-2" onclick="sendNudge(this, 'Mike')">
-        <div class="nudge-emoji">🥃</div>
-        <div class="nudge-to"><div class="dot" style="background: var(--blue);"></div> Mike</div>
-        <div class="nudge-msg">"Buffalo Trace single barrel just dropped"</div>
-        <div class="nudge-reason">New release today</div>
+      <div class="nudge-card animate-in delay-2" onclick="sendNudge(this,'Mike')">
+        <div class="nudge-thumb"><canvas id="nudge-bourbon" width="320" height="180"></canvas></div>
+        <div class="nudge-body">
+          <div class="nudge-to"><div class="dot" style="background:var(--blue);"></div> Mike</div>
+          <div class="nudge-msg">"Buffalo Trace single barrel just dropped"</div>
+          <div class="nudge-reason">New release today</div>
+        </div>
       </div>
-      <div class="nudge-card animate-in delay-3" onclick="sendNudge(this, 'Jake')">
-        <div class="nudge-emoji">⚽</div>
-        <div class="nudge-to"><div class="dot" style="background: var(--purple);"></div> Jake</div>
-        <div class="nudge-msg">"How'd the little man do yesterday?"</div>
-        <div class="nudge-reason">Kid's first soccer game</div>
+      <div class="nudge-card animate-in delay-3" onclick="sendNudge(this,'Jake')">
+        <div class="nudge-thumb"><canvas id="nudge-soccer" width="320" height="180"></canvas></div>
+        <div class="nudge-body">
+          <div class="nudge-to"><div class="dot" style="background:var(--purple);"></div> Jake</div>
+          <div class="nudge-msg">"How'd the little man do yesterday?"</div>
+          <div class="nudge-reason">Kid's first soccer game</div>
+        </div>
       </div>
       <div class="nudge-card sent animate-in delay-4">
-        <div class="nudge-emoji">🎂</div>
-        <div class="nudge-to"><div class="dot" style="background: var(--green);"></div> Sam</div>
-        <div class="nudge-msg">"Happy birthday dude, beers soon?"</div>
-        <div class="nudge-reason">Birthday was yesterday</div>
+        <div class="nudge-thumb"><canvas id="nudge-bday" width="320" height="180"></canvas></div>
+        <div class="nudge-body">
+          <div class="nudge-to"><div class="dot" style="background:var(--green);"></div> Sam</div>
+          <div class="nudge-msg">"Happy birthday dude, beers soon?"</div>
+          <div class="nudge-reason">Birthday was yesterday</div>
+        </div>
       </div>
     </div>
 
     <div class="section-label">Days since last text</div>
     <div class="friend-row animate-in delay-2">
-      <div class="fr-avatar" style="background: rgba(255,107,53,0.15); color: var(--accent);">D</div>
-      <div class="fr-info">
-        <h4>Dave</h4>
-        <p>Bears, golf, dad jokes</p>
-      </div>
+      <div class="fr-avatar" style="background:rgba(255,107,53,0.15);color:var(--accent);">D</div>
+      <div class="fr-info"><h4>Dave</h4><p>Bears, golf, dad jokes</p></div>
       <div class="fr-days">5</div>
     </div>
     <div class="friend-row animate-in delay-3">
-      <div class="fr-avatar" style="background: rgba(78,168,222,0.15); color: var(--blue);">M</div>
-      <div class="fr-info">
-        <h4>Mike</h4>
-        <p>Bourbon, poker, fishing</p>
-      </div>
+      <div class="fr-avatar" style="background:rgba(78,168,222,0.15);color:var(--blue);">M</div>
+      <div class="fr-info"><h4>Mike</h4><p>Bourbon, poker, fishing</p></div>
       <div class="fr-days warn">12</div>
     </div>
     <div class="friend-row animate-in delay-4">
-      <div class="fr-avatar" style="background: rgba(176,124,216,0.15); color: var(--purple);">J</div>
-      <div class="fr-info">
-        <h4>Jake</h4>
-        <p>New dad, soccer, BBQ</p>
-      </div>
+      <div class="fr-avatar" style="background:rgba(176,124,216,0.15);color:var(--purple);">J</div>
+      <div class="fr-info"><h4>Jake</h4><p>New dad, soccer, BBQ</p></div>
       <div class="fr-days danger">21</div>
     </div>
     <div class="friend-row animate-in delay-5">
-      <div class="fr-avatar" style="background: rgba(46,196,182,0.15); color: var(--green);">S</div>
-      <div class="fr-info">
-        <h4>Sam</h4>
-        <p>Music, hiking, movies</p>
-      </div>
+      <div class="fr-avatar" style="background:rgba(46,196,182,0.15);color:var(--green);">S</div>
+      <div class="fr-info"><h4>Sam</h4><p>Music, hiking, movies</p></div>
       <div class="fr-days">1</div>
     </div>
-
-    <div style="margin-top: 20px;">
-      <button class="send-btn" onclick="openModal()" style="background: var(--surface2); border: 1px solid var(--border);">
-        + Add a friend
-      </button>
+    <div style="margin-top:20px;">
+      <button class="send-btn" onclick="openModal()" style="background:var(--surface2);border:1px solid var(--border);">+ Add a friend</button>
     </div>
   </div>
 
 </div>
 
-<!-- Tab bar -->
 <div class="tab-bar">
-  <button class="tab active" onclick="switchTab('ammo', this)">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
-    Ammo
+  <button class="tab active" onclick="switchTab('ammo',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>Ammo
   </button>
-  <button class="tab" onclick="switchTab('jokes', this)">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-    Jokes
+  <button class="tab" onclick="switchTab('jokes',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>Jokes
   </button>
-  <button class="tab" onclick="switchTab('nudges', this)">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
-    Nudges
+  <button class="tab" onclick="switchTab('nudges',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>Nudges
   </button>
 </div>
 
 <script>
+// ======== CANVAS DRAWING ENGINE ========
+
+function drawBearsGif(canvasId, large) {
+  const c = document.getElementById(canvasId);
+  if (!c) return;
+  const ctx = c.getContext('2d');
+  const W = c.width, H = c.height;
+  let frame = 0;
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+
+    // Dark navy stadium bg
+    const grad = ctx.createLinearGradient(0, 0, 0, H);
+    grad.addColorStop(0, '#0b1628');
+    grad.addColorStop(1, '#162d50');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
+
+    // Stadium lights
+    for (let i = 0; i < 5; i++) {
+      const lx = W * 0.1 + (W * 0.8) * (i / 4);
+      const ly = 30;
+      ctx.beginPath();
+      const lgr = ctx.createRadialGradient(lx, ly, 0, lx, ly, 60);
+      lgr.addColorStop(0, 'rgba(255,220,150,0.3)');
+      lgr.addColorStop(1, 'rgba(255,220,150,0)');
+      ctx.fillStyle = lgr;
+      ctx.arc(lx, ly, 60, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Field
+    ctx.fillStyle = '#1a5c2a';
+    ctx.fillRect(0, H * 0.55, W, H * 0.45);
+    // Yard lines
+    ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+    ctx.lineWidth = 2;
+    for (let i = 0; i < 10; i++) {
+      const x = W * 0.05 + (W * 0.9) * (i / 9);
+      ctx.beginPath(); ctx.moveTo(x, H * 0.55); ctx.lineTo(x, H); ctx.stroke();
+    }
+
+    // Scoreboard
+    const sbW = large ? 280 : 240;
+    const sbH = large ? 90 : 70;
+    const sbX = (W - sbW) / 2;
+    const sbY = H * 0.12;
+    ctx.fillStyle = '#111';
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 2;
+    roundRect(ctx, sbX, sbY, sbW, sbH, 8);
+    ctx.fill(); ctx.stroke();
+
+    const sz = large ? 16 : 13;
+    ctx.font = `bold ${sz}px Inter, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#ff6b35';
+    ctx.fillText('BEARS', sbX + sbW * 0.25, sbY + sbH * 0.4);
+    ctx.fillStyle = '#2d6a2e';
+    ctx.fillText('PACKERS', sbX + sbW * 0.75, sbY + sbH * 0.4);
+
+    const numSz = large ? 32 : 24;
+    ctx.font = `900 ${numSz}px Inter, sans-serif`;
+    ctx.fillStyle = '#ef4444';
+    ctx.fillText('17', sbX + sbW * 0.25, sbY + sbH * 0.8);
+    ctx.fillStyle = '#4ade80';
+    ctx.fillText('24', sbX + sbW * 0.75, sbY + sbH * 0.8);
+
+    ctx.fillStyle = '#666';
+    ctx.font = `bold ${large ? 12 : 10}px Inter, sans-serif`;
+    ctx.fillText('FINAL', sbX + sbW * 0.5, sbY + sbH * 0.6);
+
+    // Sad bear character
+    const bx = W * 0.5;
+    const by = H * 0.72;
+    const bs = large ? 1.0 : 0.7;
+    const bob = Math.sin(frame * 0.05) * 3;
+
+    // Body
+    ctx.fillStyle = '#8B5E3C';
+    ctx.beginPath();
+    ctx.ellipse(bx, by + 20 * bs + bob, 35 * bs, 45 * bs, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Head
+    ctx.beginPath();
+    ctx.arc(bx, by - 30 * bs + bob, 30 * bs, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Ears
+    ctx.beginPath();
+    ctx.arc(bx - 22 * bs, by - 52 * bs + bob, 12 * bs, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(bx + 22 * bs, by - 52 * bs + bob, 12 * bs, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#6B4226';
+    ctx.beginPath();
+    ctx.arc(bx - 22 * bs, by - 52 * bs + bob, 7 * bs, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(bx + 22 * bs, by - 52 * bs + bob, 7 * bs, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Snout
+    ctx.fillStyle = '#C4915A';
+    ctx.beginPath();
+    ctx.ellipse(bx, by - 22 * bs + bob, 14 * bs, 10 * bs, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // X eyes (dead inside)
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 3 * bs;
+    ctx.lineCap = 'round';
+    const ex = 10 * bs, ey = by - 35 * bs + bob;
+    // Left X
+    ctx.beginPath(); ctx.moveTo(bx - ex - 5*bs, ey - 5*bs); ctx.lineTo(bx - ex + 5*bs, ey + 5*bs); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(bx - ex + 5*bs, ey - 5*bs); ctx.lineTo(bx - ex - 5*bs, ey + 5*bs); ctx.stroke();
+    // Right X
+    ctx.beginPath(); ctx.moveTo(bx + ex - 5*bs, ey - 5*bs); ctx.lineTo(bx + ex + 5*bs, ey + 5*bs); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(bx + ex + 5*bs, ey - 5*bs); ctx.lineTo(bx + ex - 5*bs, ey + 5*bs); ctx.stroke();
+
+    // Nose
+    ctx.fillStyle = '#333';
+    ctx.beginPath();
+    ctx.ellipse(bx, by - 23 * bs + bob, 5 * bs, 4 * bs, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Frown
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 2 * bs;
+    ctx.beginPath();
+    ctx.arc(bx, by - 12 * bs + bob, 8 * bs, 0.2, Math.PI - 0.2, true);
+    ctx.stroke();
+
+    // Jersey
+    ctx.fillStyle = '#0B162A';
+    ctx.beginPath();
+    ctx.ellipse(bx, by + 25 * bs + bob, 28 * bs, 30 * bs, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#ff6b35';
+    ctx.font = `900 ${20 * bs}px Inter, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.fillText('C', bx, by + 32 * bs + bob);
+
+    // Tear drops
+    const tearY = ey + 12 * bs + ((frame * 2) % 30) * bs;
+    const tearAlpha = 1 - ((frame * 2) % 30) / 30;
+    ctx.fillStyle = `rgba(100,180,255,${tearAlpha})`;
+    ctx.beginPath();
+    ctx.arc(bx - ex, tearY, 3 * bs, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(bx + ex, tearY + 8, 3 * bs, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Text overlay
+    if (large) {
+      ctx.fillStyle = '#fff';
+      ctx.font = '900 28px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = '#000';
+      ctx.strokeText('EVERY. SINGLE. WEEK.', W/2, H - 30);
+      ctx.fillText('EVERY. SINGLE. WEEK.', W/2, H - 30);
+    }
+
+    frame++;
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+function drawBourbonGif(canvasId, large) {
+  const c = document.getElementById(canvasId);
+  if (!c) return;
+  const ctx = c.getContext('2d');
+  const W = c.width, H = c.height;
+  let frame = 0;
+  const particles = [];
+  for (let i = 0; i < 20; i++) {
+    particles.push({
+      x: Math.random() * W, y: Math.random() * H,
+      vx: (Math.random() - 0.5) * 0.5, vy: -Math.random() * 1.5 - 0.5,
+      size: Math.random() * 3 + 1, life: Math.random()
+    });
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+
+    // Warm gradient bg
+    const grad = ctx.createRadialGradient(W/2, H*0.6, 0, W/2, H*0.6, W*0.7);
+    grad.addColorStop(0, '#3d1f00');
+    grad.addColorStop(0.5, '#1a0e00');
+    grad.addColorStop(1, '#0a0500');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
+
+    // Warm glow behind bottle
+    const glow = ctx.createRadialGradient(W/2, H*0.55, 0, W/2, H*0.55, 120);
+    glow.addColorStop(0, 'rgba(255,140,0,0.15)');
+    glow.addColorStop(1, 'rgba(255,140,0,0)');
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, W, H);
+
+    const s = large ? 1.0 : 0.6;
+    const bx = W / 2;
+    const by = H * 0.5;
+
+    // Bottle
+    ctx.fillStyle = '#2a1800';
+    ctx.strokeStyle = '#5a3a1a';
+    ctx.lineWidth = 2;
+
+    // Bottle body
+    ctx.beginPath();
+    ctx.moveTo(bx - 30*s, by + 80*s);
+    ctx.lineTo(bx - 30*s, by - 20*s);
+    ctx.quadraticCurveTo(bx - 30*s, by - 40*s, bx - 15*s, by - 50*s);
+    ctx.lineTo(bx - 12*s, by - 80*s);
+    ctx.lineTo(bx + 12*s, by - 80*s);
+    ctx.lineTo(bx + 15*s, by - 50*s);
+    ctx.quadraticCurveTo(bx + 30*s, by - 40*s, bx + 30*s, by - 20*s);
+    ctx.lineTo(bx + 30*s, by + 80*s);
+    ctx.closePath();
+    ctx.fill(); ctx.stroke();
+
+    // Liquid level with wave
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(bx - 29*s, by - 10*s, 58*s, 89*s);
+    ctx.clip();
+    const wave = Math.sin(frame * 0.06) * 4 * s;
+    ctx.fillStyle = '#8B4513';
+    ctx.beginPath();
+    ctx.moveTo(bx - 30*s, by + 80*s);
+    ctx.lineTo(bx - 30*s, by + 10*s + wave);
+    for (let x = -30; x <= 30; x += 5) {
+      ctx.lineTo(bx + x*s, by + 10*s + Math.sin((x + frame*2)*0.1)*4*s + wave);
+    }
+    ctx.lineTo(bx + 30*s, by + 80*s);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+
+    // Label
+    ctx.fillStyle = '#f5e6c8';
+    roundRect(ctx, bx - 24*s, by + 5*s, 48*s, 40*s, 4);
+    ctx.fill();
+    ctx.fillStyle = '#2a1800';
+    ctx.font = `900 ${8*s}px Inter, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.fillText('BUFFALO', bx, by + 22*s);
+    ctx.fillText('TRACE', bx, by + 32*s);
+    ctx.font = `600 ${5*s}px Inter, sans-serif`;
+    ctx.fillText('SINGLE BARREL', bx, by + 40*s);
+
+    // Cap
+    ctx.fillStyle = '#1a0e00';
+    ctx.fillRect(bx - 10*s, by - 88*s, 20*s, 10*s);
+
+    // Sparkle particles
+    particles.forEach(p => {
+      p.x += p.vx;
+      p.y += p.vy;
+      p.life -= 0.008;
+      if (p.life <= 0 || p.y < 0) {
+        p.x = bx + (Math.random() - 0.5) * 80 * s;
+        p.y = by + 80 * s;
+        p.life = 1;
+        p.vy = -Math.random() * 1.5 - 0.5;
+      }
+      ctx.fillStyle = `rgba(255,180,50,${p.life * 0.6})`;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size * s, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    // Text
+    if (large) {
+      ctx.fillStyle = '#f5e6c8';
+      ctx.font = '900 24px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.strokeStyle = '#000';
+      ctx.lineWidth = 4;
+      ctx.strokeText('LIMITED DROP ALERT', W/2, H - 35);
+      ctx.fillText('LIMITED DROP ALERT', W/2, H - 35);
+      ctx.font = '600 14px Inter, sans-serif';
+      ctx.fillStyle = '#ff9f1c';
+      ctx.strokeText('Single Barrel Select', W/2, H - 14);
+      ctx.fillText('Single Barrel Select', W/2, H - 14);
+    }
+
+    frame++;
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+function drawSoccerGif(canvasId, large) {
+  const c = document.getElementById(canvasId);
+  if (!c) return;
+  const ctx = c.getContext('2d');
+  const W = c.width, H = c.height;
+  let frame = 0;
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+
+    // Sky
+    const sky = ctx.createLinearGradient(0, 0, 0, H * 0.6);
+    sky.addColorStop(0, '#1a3a5c');
+    sky.addColorStop(1, '#4a90c2');
+    ctx.fillStyle = sky;
+    ctx.fillRect(0, 0, W, H);
+
+    // Grass
+    ctx.fillStyle = '#2d8c3e';
+    ctx.fillRect(0, H * 0.55, W, H * 0.45);
+    // Grass stripes
+    ctx.fillStyle = '#34a047';
+    for (let i = 0; i < 8; i += 2) {
+      ctx.fillRect(W * (i/8), H * 0.55, W/8, H * 0.45);
+    }
+
+    // Goal posts
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = large ? 5 : 3;
+    const gx = W * 0.5, gy = H * 0.4;
+    const gw = large ? 120 : 80;
+    const gh = large ? 70 : 45;
+    ctx.beginPath();
+    ctx.moveTo(gx - gw/2, gy + gh);
+    ctx.lineTo(gx - gw/2, gy);
+    ctx.lineTo(gx + gw/2, gy);
+    ctx.lineTo(gx + gw/2, gy + gh);
+    ctx.stroke();
+    // Net lines
+    ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < 8; i++) {
+      const nx = gx - gw/2 + (gw/7) * i;
+      ctx.beginPath(); ctx.moveTo(nx, gy); ctx.lineTo(nx, gy + gh); ctx.stroke();
+    }
+    for (let i = 0; i < 5; i++) {
+      const ny = gy + (gh/4) * i;
+      ctx.beginPath(); ctx.moveTo(gx - gw/2, ny); ctx.lineTo(gx + gw/2, ny); ctx.stroke();
+    }
+
+    // Soccer ball bouncing
+    const ballX = W * 0.5 + Math.sin(frame * 0.03) * 40;
+    const bounce = Math.abs(Math.sin(frame * 0.06)) * 40;
+    const ballY = H * 0.65 - bounce;
+    const ballR = large ? 18 : 12;
+
+    // Ball shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.2)';
+    ctx.beginPath();
+    ctx.ellipse(ballX, H * 0.68, ballR * 1.2, 5, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Ball
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.arc(ballX, ballY, ballR, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // Pentagon pattern on ball
+    ctx.fillStyle = '#333';
+    const rot = frame * 0.02;
+    for (let i = 0; i < 5; i++) {
+      const angle = rot + (Math.PI * 2 / 5) * i;
+      const px = ballX + Math.cos(angle) * ballR * 0.5;
+      const py = ballY + Math.sin(angle) * ballR * 0.5;
+      ctx.beginPath();
+      ctx.arc(px, py, ballR * 0.2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Little kid figure
+    const kx = W * 0.3;
+    const ky = H * 0.65;
+    const ks = large ? 1 : 0.65;
+    const run = Math.sin(frame * 0.1) * 5;
+
+    // Legs
+    ctx.strokeStyle = '#f5c5a3';
+    ctx.lineWidth = 4 * ks;
+    ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(kx, ky + 15*ks); ctx.lineTo(kx - 8*ks, ky + 35*ks + run); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(kx, ky + 15*ks); ctx.lineTo(kx + 8*ks, ky + 35*ks - run); ctx.stroke();
+
+    // Body (jersey)
+    ctx.fillStyle = '#4ea8de';
+    ctx.beginPath();
+    ctx.ellipse(kx, ky + 5*ks, 12*ks, 15*ks, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Head
+    ctx.fillStyle = '#f5c5a3';
+    ctx.beginPath();
+    ctx.arc(kx, ky - 15*ks, 10*ks, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Hair
+    ctx.fillStyle = '#5a3a1a';
+    ctx.beginPath();
+    ctx.arc(kx, ky - 18*ks, 10*ks, Math.PI, Math.PI * 2);
+    ctx.fill();
+
+    // Happy face
+    ctx.fillStyle = '#333';
+    ctx.beginPath();
+    ctx.arc(kx - 3*ks, ky - 16*ks, 1.5*ks, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(kx + 3*ks, ky - 16*ks, 1.5*ks, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 1.5*ks;
+    ctx.beginPath();
+    ctx.arc(kx, ky - 11*ks, 4*ks, 0.2, Math.PI - 0.2);
+    ctx.stroke();
+
+    // Arms up (celebrating)
+    ctx.strokeStyle = '#f5c5a3';
+    ctx.lineWidth = 3*ks;
+    ctx.beginPath(); ctx.moveTo(kx - 10*ks, ky); ctx.lineTo(kx - 20*ks, ky - 15*ks + run*0.5); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(kx + 10*ks, ky); ctx.lineTo(kx + 20*ks, ky - 15*ks - run*0.5); ctx.stroke();
+
+    // Text
+    if (large) {
+      ctx.fillStyle = '#fff';
+      ctx.font = '900 26px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.strokeStyle = '#000';
+      ctx.lineWidth = 4;
+      ctx.strokeText('FIRST GAME DAY!', W/2, H - 25);
+      ctx.fillText('FIRST GAME DAY!', W/2, H - 25);
+    }
+
+    frame++;
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+// ---- Meme canvases (Jokes tab) ----
+
+function drawMemeWisconsin(canvasId) {
+  const c = document.getElementById(canvasId);
+  if (!c) return;
+  const ctx = c.getContext('2d');
+  const W = c.width, H = c.height;
+  let frame = 0;
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+
+    // Night sky
+    const grad = ctx.createLinearGradient(0, 0, 0, H);
+    grad.addColorStop(0, '#0a0a2e');
+    grad.addColorStop(0.6, '#1a1a3e');
+    grad.addColorStop(1, '#0d2b0d');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
+
+    // Stars
+    for (let i = 0; i < 30; i++) {
+      const sx = (i * 137.5 + frame * 0.1) % W;
+      const sy = (i * 97.3) % (H * 0.5);
+      const twinkle = Math.sin(frame * 0.05 + i) * 0.5 + 0.5;
+      ctx.fillStyle = `rgba(255,255,255,${twinkle * 0.7})`;
+      ctx.beginPath();
+      ctx.arc(sx, sy, 1.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Moon
+    ctx.fillStyle = '#e8e0c0';
+    ctx.beginPath();
+    ctx.arc(W * 0.8, H * 0.15, 35, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Dark trees silhouette
+    for (let i = 0; i < 12; i++) {
+      const tx = W * (i / 11);
+      const th = 80 + Math.sin(i * 2.3) * 40;
+      ctx.fillStyle = '#0a1a0a';
+      ctx.beginPath();
+      ctx.moveTo(tx - 15, H * 0.65);
+      ctx.lineTo(tx, H * 0.65 - th);
+      ctx.lineTo(tx + 15, H * 0.65);
+      ctx.fill();
+    }
+
+    // Road
+    ctx.fillStyle = '#1a1a1a';
+    ctx.beginPath();
+    ctx.moveTo(W * 0.3, H);
+    ctx.lineTo(W * 0.48, H * 0.5);
+    ctx.lineTo(W * 0.52, H * 0.5);
+    ctx.lineTo(W * 0.7, H);
+    ctx.fill();
+
+    // Road dashes
+    ctx.strokeStyle = '#ff0';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([15, 20]);
+    ctx.lineDashOffset = -frame * 2;
+    ctx.beginPath();
+    ctx.moveTo(W * 0.5, H * 0.55);
+    ctx.lineTo(W * 0.5, H);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // "WELCOME TO NOWHERE" sign
+    const signBob = Math.sin(frame * 0.04) * 2;
+    ctx.fillStyle = '#1a5c2a';
+    roundRect(ctx, W * 0.1, H * 0.55 + signBob, 160, 50, 6);
+    ctx.fill();
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 2;
+    roundRect(ctx, W * 0.1 + 4, H * 0.55 + 4 + signBob, 152, 42, 4);
+    ctx.stroke();
+    ctx.fillStyle = '#fff';
+    ctx.font = '900 11px Inter, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('WELCOME TO', W * 0.1 + 80, H * 0.55 + 24 + signBob);
+    ctx.fillText('NOWHERE, WI', W * 0.1 + 80, H * 0.55 + 40 + signBob);
+
+    // Sign post
+    ctx.fillStyle = '#555';
+    ctx.fillRect(W * 0.1 + 76, H * 0.55 + 50 + signBob, 8, 40);
+
+    // Car headlights
+    const carX = W * 0.5;
+    const carY = H * 0.78;
+    ctx.fillStyle = 'rgba(255,240,150,0.1)';
+    ctx.beginPath();
+    ctx.moveTo(carX - 10, carY);
+    ctx.lineTo(carX - 60, carY - 100);
+    ctx.lineTo(carX + 60, carY - 100);
+    ctx.lineTo(carX + 10, carY);
+    ctx.fill();
+
+    // Car
+    ctx.fillStyle = '#333';
+    roundRect(ctx, carX - 30, carY, 60, 25, 6);
+    ctx.fill();
+    ctx.fillStyle = '#444';
+    roundRect(ctx, carX - 22, carY - 15, 44, 18, 4);
+    ctx.fill();
+    // Headlights
+    ctx.fillStyle = '#ffee88';
+    ctx.beginPath(); ctx.arc(carX - 25, carY + 8, 4, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(carX + 25, carY + 8, 4, 0, Math.PI * 2); ctx.fill();
+
+    // Meme text
+    memeText(ctx, 'WHEN DAVE SAYS', W/2, 40, 28);
+    memeText(ctx, '"I KNOW A SHORTCUT"', W/2, 75, 28);
+    memeText(ctx, '3 HOURS LATER...', W/2, H - 20, 24);
+
+    frame++;
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+function drawMemePoker(canvasId) {
+  const c = document.getElementById(canvasId);
+  if (!c) return;
+  const ctx = c.getContext('2d');
+  const W = c.width, H = c.height;
+  let frame = 0;
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+
+    // Casino bg
+    const grad = ctx.createRadialGradient(W/2, H/2, 0, W/2, H/2, W * 0.6);
+    grad.addColorStop(0, '#1a3a1a');
+    grad.addColorStop(1, '#0a150a');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
+
+    // Felt texture dots
+    ctx.fillStyle = 'rgba(255,255,255,0.02)';
+    for (let i = 0; i < 50; i++) {
+      ctx.beginPath();
+      ctx.arc((i * 83.7) % W, (i * 127.3) % H, 2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Poker table oval
+    ctx.fillStyle = '#0d4d0d';
+    ctx.strokeStyle = '#4a2a00';
+    ctx.lineWidth = 12;
+    ctx.beginPath();
+    ctx.ellipse(W/2, H * 0.55, W * 0.4, H * 0.3, 0, 0, Math.PI * 2);
+    ctx.fill(); ctx.stroke();
+
+    // Inner felt line
+    ctx.strokeStyle = '#1a6a1a';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.ellipse(W/2, H * 0.55, W * 0.35, H * 0.25, 0, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Chip stacks
+    drawChipStack(ctx, W * 0.25, H * 0.5, frame);
+    drawChipStack(ctx, W * 0.75, H * 0.5, frame + 10);
+
+    // Cards face up - pair of 3s
+    const cardW = 50, cardH = 70;
+    const cx = W/2 - 30, cy = H * 0.45;
+    const tilt1 = -0.15 + Math.sin(frame * 0.02) * 0.02;
+    const tilt2 = 0.15 + Math.sin(frame * 0.02 + 1) * 0.02;
+
+    drawCard(ctx, cx - 15, cy, cardW, cardH, '3', 'hearts', tilt1);
+    drawCard(ctx, cx + 25, cy, cardW, cardH, '3', 'diamonds', tilt2);
+
+    // Pot amount
+    ctx.fillStyle = '#ffcc00';
+    ctx.font = '900 20px Inter, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 3;
+    const potBob = Math.sin(frame * 0.05) * 2;
+    ctx.strokeText('POT: $2,847', W/2, H * 0.7 + potBob);
+    ctx.fillText('POT: $2,847', W/2, H * 0.7 + potBob);
+
+    // Meme text
+    memeText(ctx, 'MIKE: "I\'M ALL IN"', W/2, 40, 26);
+    memeText(ctx, 'NARRATOR: HE HAD', W/2, H - 50, 22);
+    memeText(ctx, 'A PAIR OF 3s', W/2, H - 22, 26);
+
+    frame++;
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+function drawMemePizza(canvasId) {
+  const c = document.getElementById(canvasId);
+  if (!c) return;
+  const ctx = c.getContext('2d');
+  const W = c.width, H = c.height;
+  let frame = 0;
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+
+    // Warm pizza joint bg
+    const grad = ctx.createLinearGradient(0, 0, 0, H);
+    grad.addColorStop(0, '#2a1500');
+    grad.addColorStop(1, '#1a0d00');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
+
+    // Checkerboard table
+    const tileSize = 30;
+    for (let row = 0; row < 6; row++) {
+      for (let col = 0; col < W/tileSize + 1; col++) {
+        ctx.fillStyle = (row + col) % 2 === 0 ? '#cc3333' : '#fff';
+        ctx.globalAlpha = 0.1;
+        ctx.fillRect(col * tileSize, H * 0.6 + row * tileSize, tileSize, tileSize);
+      }
+    }
+    ctx.globalAlpha = 1;
+
+    // Pizza box
+    ctx.fillStyle = '#d4a056';
+    roundRect(ctx, W * 0.15, H * 0.35, W * 0.7, H * 0.35, 8);
+    ctx.fill();
+    ctx.strokeStyle = '#8B6914';
+    ctx.lineWidth = 2;
+    roundRect(ctx, W * 0.15, H * 0.35, W * 0.7, H * 0.35, 8);
+    ctx.stroke();
+
+    // Pizza slices (progressively disappearing)
+    const slicesGone = Math.floor((frame / 60) % 5);
+    const centerX = W * 0.5;
+    const centerY = H * 0.52;
+    const radius = 80;
+
+    for (let i = 0; i < 8; i++) {
+      if (i < slicesGone) continue;
+      const startAngle = (Math.PI * 2 / 8) * i - Math.PI / 2;
+      const endAngle = startAngle + Math.PI * 2 / 8;
+
+      // Crust
+      ctx.fillStyle = '#e8c060';
+      ctx.beginPath();
+      ctx.moveTo(centerX, centerY);
+      ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+      ctx.closePath();
+      ctx.fill();
+
+      // Sauce
+      ctx.fillStyle = '#cc3333';
+      ctx.beginPath();
+      ctx.moveTo(centerX, centerY);
+      ctx.arc(centerX, centerY, radius * 0.85, startAngle + 0.05, endAngle - 0.05);
+      ctx.closePath();
+      ctx.fill();
+
+      // Cheese
+      ctx.fillStyle = '#f0d060';
+      ctx.beginPath();
+      ctx.moveTo(centerX, centerY);
+      ctx.arc(centerX, centerY, radius * 0.8, startAngle + 0.08, endAngle - 0.08);
+      ctx.closePath();
+      ctx.fill();
+
+      // Pepperoni
+      const pepAngle = (startAngle + endAngle) / 2;
+      const pepR = radius * 0.55;
+      ctx.fillStyle = '#aa2222';
+      ctx.beginPath();
+      ctx.arc(centerX + Math.cos(pepAngle) * pepR, centerY + Math.sin(pepAngle) * pepR, 7, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Slice count
+    const remaining = 8 - slicesGone;
+    ctx.fillStyle = '#fff';
+    ctx.font = '900 16px Inter, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 3;
+    const countText = `${8 - remaining}/8 SLICES GONE`;
+    ctx.strokeText(countText, W/2, H * 0.78);
+    ctx.fillText(countText, W/2, H * 0.78);
+
+    // Meme text
+    memeText(ctx, 'JAKE: "JUST ONE SLICE"', W/2, 36, 24);
+    memeText(ctx, '"I WASN\'T EVEN HUNGRY"', W/2, H - 20, 22);
+
+    frame++;
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+// Nudge thumbnails (smaller, no text)
+function drawNudgeThumb(canvasId, type) {
+  const c = document.getElementById(canvasId);
+  if (!c) return;
+  const ctx = c.getContext('2d');
+  const W = c.width, H = c.height;
+  let frame = 0;
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+
+    if (type === 'bears') {
+      const grad = ctx.createLinearGradient(0, 0, 0, H);
+      grad.addColorStop(0, '#0b1628');
+      grad.addColorStop(1, '#162d50');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = '#1a5c2a';
+      ctx.fillRect(0, H * 0.65, W, H * 0.35);
+      // Mini scoreboard
+      ctx.fillStyle = '#111';
+      roundRect(ctx, W * 0.2, H * 0.15, W * 0.6, H * 0.4, 6);
+      ctx.fill();
+      ctx.fillStyle = '#ef4444';
+      ctx.font = 'bold 18px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('17', W * 0.38, H * 0.45);
+      ctx.fillStyle = '#4ade80';
+      ctx.fillText('24', W * 0.62, H * 0.45);
+      ctx.fillStyle = '#ff6b35';
+      ctx.font = 'bold 9px Inter, sans-serif';
+      ctx.fillText('CHI', W * 0.38, H * 0.25);
+      ctx.fillStyle = '#2d6a2e';
+      ctx.fillText('GB', W * 0.62, H * 0.25);
+      // L stamp
+      ctx.save();
+      ctx.translate(W * 0.78, H * 0.6);
+      ctx.rotate(-0.2);
+      ctx.fillStyle = 'rgba(239,68,68,0.3)';
+      ctx.font = '900 36px Inter, sans-serif';
+      ctx.fillText('L', 0, 0);
+      ctx.restore();
+    }
+    else if (type === 'bourbon') {
+      const grad = ctx.createRadialGradient(W/2, H/2, 0, W/2, H/2, W*0.6);
+      grad.addColorStop(0, '#3d1f00');
+      grad.addColorStop(1, '#0a0500');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, W, H);
+      // Mini bottle
+      const bx = W/2, by = H/2;
+      ctx.fillStyle = '#2a1800';
+      ctx.beginPath();
+      ctx.moveTo(bx-16, by+40); ctx.lineTo(bx-16, by-10);
+      ctx.quadraticCurveTo(bx-16, by-22, bx-8, by-28);
+      ctx.lineTo(bx-6, by-45); ctx.lineTo(bx+6, by-45);
+      ctx.lineTo(bx+8, by-28);
+      ctx.quadraticCurveTo(bx+16, by-22, bx+16, by-10);
+      ctx.lineTo(bx+16, by+40); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#f5e6c8';
+      roundRect(ctx, bx-12, by+5, 24, 20, 3);
+      ctx.fill();
+      // Glow
+      const glow = ctx.createRadialGradient(bx, by, 0, bx, by, 60);
+      glow.addColorStop(0, 'rgba(255,140,0,0.1)');
+      glow.addColorStop(1, 'rgba(255,140,0,0)');
+      ctx.fillStyle = glow;
+      ctx.fillRect(0, 0, W, H);
+    }
+    else if (type === 'soccer') {
+      const sky = ctx.createLinearGradient(0, 0, 0, H);
+      sky.addColorStop(0, '#1a3a5c');
+      sky.addColorStop(1, '#4a90c2');
+      ctx.fillStyle = sky;
+      ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = '#2d8c3e';
+      ctx.fillRect(0, H * 0.6, W, H * 0.4);
+      // Ball
+      const bounce = Math.abs(Math.sin(frame * 0.06)) * 20;
+      ctx.fillStyle = '#fff';
+      ctx.beginPath();
+      ctx.arc(W/2, H * 0.55 - bounce, 14, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#333'; ctx.lineWidth = 1;
+      ctx.stroke();
+      // Pentagon
+      ctx.fillStyle = '#333';
+      for (let i = 0; i < 5; i++) {
+        const a = frame*0.02 + (Math.PI*2/5)*i;
+        ctx.beginPath();
+        ctx.arc(W/2 + Math.cos(a)*7, H*0.55-bounce+Math.sin(a)*7, 3, 0, Math.PI*2);
+        ctx.fill();
+      }
+    }
+    else if (type === 'bday') {
+      const grad = ctx.createLinearGradient(0, 0, 0, H);
+      grad.addColorStop(0, '#1a0a2e');
+      grad.addColorStop(1, '#2a1040');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, W, H);
+      // Confetti
+      for (let i = 0; i < 15; i++) {
+        const cx2 = (i * 47.3 + frame * 0.5) % W;
+        const cy2 = (i * 31.7 + frame * 0.8) % H;
+        ctx.fillStyle = ['#ff6b35','#ff9f1c','#4ea8de','#b07cd8','#2ec4b6'][i % 5];
+        ctx.save();
+        ctx.translate(cx2, cy2);
+        ctx.rotate(frame * 0.02 + i);
+        ctx.fillRect(-3, -6, 6, 12);
+        ctx.restore();
+      }
+      // Cake
+      const ckx = W/2, cky = H * 0.6;
+      ctx.fillStyle = '#d4856a';
+      roundRect(ctx, ckx-30, cky, 60, 35, 4);
+      ctx.fill();
+      ctx.fillStyle = '#f0a0a0';
+      roundRect(ctx, ckx-30, cky, 60, 12, 4);
+      ctx.fill();
+      // Candles
+      for (let i = 0; i < 3; i++) {
+        const candleX = ckx - 15 + i * 15;
+        ctx.fillStyle = '#4ea8de';
+        ctx.fillRect(candleX - 2, cky - 18, 4, 20);
+        // Flame
+        const flicker = Math.sin(frame * 0.15 + i) * 2;
+        ctx.fillStyle = '#ff9f1c';
+        ctx.beginPath();
+        ctx.ellipse(candleX, cky - 22 + flicker, 4, 7, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#ffee88';
+        ctx.beginPath();
+        ctx.ellipse(candleX, cky - 22 + flicker, 2, 4, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    frame++;
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+// ---- Helpers ----
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+function memeText(ctx, text, x, y, size) {
+  ctx.font = `900 ${size}px Inter, sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#fff';
+  ctx.strokeStyle = '#000';
+  ctx.lineWidth = size * 0.15;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.strokeText(text, x, y);
+  ctx.fillText(text, x, y);
+}
+
+function drawChipStack(ctx, x, y, offset) {
+  const colors = ['#cc3333', '#3333cc', '#33cc33', '#ffcc00'];
+  for (let i = 0; i < 4; i++) {
+    ctx.fillStyle = colors[i];
+    ctx.beginPath();
+    ctx.ellipse(x, y - i * 6, 16, 8, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+}
+
+function drawCard(ctx, x, y, w, h, value, suit, rotation) {
+  ctx.save();
+  ctx.translate(x + w/2, y + h/2);
+  ctx.rotate(rotation);
+  // Card bg
+  ctx.fillStyle = '#fff';
+  roundRect(ctx, -w/2, -h/2, w, h, 5);
+  ctx.fill();
+  ctx.strokeStyle = '#ccc';
+  ctx.lineWidth = 1;
+  roundRect(ctx, -w/2, -h/2, w, h, 5);
+  ctx.stroke();
+  // Value + suit
+  const suitColor = (suit === 'hearts' || suit === 'diamonds') ? '#cc0000' : '#000';
+  ctx.fillStyle = suitColor;
+  ctx.font = '900 22px Inter, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(value, 0, -5);
+  const suitChar = {hearts: '\u2665', diamonds: '\u2666', clubs: '\u2663', spades: '\u2660'}[suit];
+  ctx.font = '18px serif';
+  ctx.fillText(suitChar, 0, 20);
+  ctx.restore();
+}
+
+// ---- Init all canvases ----
+function initCanvases() {
+  drawBearsGif('gif-bears', true);
+  drawBourbonGif('gif-bourbon', true);
+  drawSoccerGif('gif-soccer', true);
+  drawMemeWisconsin('meme-wisconsin');
+  drawMemePoker('meme-poker');
+  drawMemePizza('meme-pizza');
+  drawNudgeThumb('nudge-bears', 'bears');
+  drawNudgeThumb('nudge-bourbon', 'bourbon');
+  drawNudgeThumb('nudge-soccer', 'soccer');
+  drawNudgeThumb('nudge-bday', 'bday');
+}
+
+// ---- App logic ----
 function switchTab(view, btn) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.getElementById('view-' + view).classList.add('active');
   btn.classList.add('active');
-  // haptic
   if (navigator.vibrate) navigator.vibrate(10);
 }
 
@@ -782,17 +1488,12 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 1800);
 }
 
-function sendAmmo(name, topic) {
-  // On real device this would open iMessage with pre-filled content
-  const smsUrl = `sms:&body=`;
-  // For demo just show toast
+function sendAmmo(name) {
   showToast(`Opening iMessage to ${name}`);
   if (navigator.vibrate) navigator.vibrate([10, 50, 10]);
-  // Uncomment for real device:
-  // window.location.href = smsUrl;
 }
 
-function sendJoke(name, topic) {
+function sendJoke(name) {
   showToast(`Sent to ${name}`);
   if (navigator.vibrate) navigator.vibrate([10, 50, 10]);
 }
@@ -807,34 +1508,26 @@ function sendNudge(card, name) {
 function refreshJoke(btn) {
   const card = btn.closest('.joke-card');
   card.style.opacity = '0.5';
-  setTimeout(() => {
-    card.style.opacity = '1';
-    showToast('New version generated');
-  }, 600);
+  setTimeout(() => { card.style.opacity = '1'; showToast('New version generated'); }, 600);
 }
 
-function toggleTag(el) {
-  el.classList.toggle('selected');
-}
+function toggleTag(el) { el.classList.toggle('selected'); }
 
-function openModal() {
-  document.getElementById('addModal').classList.remove('hidden');
-}
-function closeModal() {
-  document.getElementById('addModal').classList.add('hidden');
-}
+function openModal() { document.getElementById('addModal').classList.remove('hidden'); }
+function closeModal() { document.getElementById('addModal').classList.add('hidden'); }
 
 function addFriend() {
   const name = document.getElementById('friendName').value.trim();
   if (!name) { showToast('Enter a name'); return; }
   showToast(`${name} added`);
   closeModal();
-  // Reset form
   document.getElementById('friendName').value = '';
   document.getElementById('friendPhone').value = '';
   document.getElementById('friendInterests').value = '';
   document.getElementById('friendMemories').value = '';
 }
+
+window.addEventListener('DOMContentLoaded', initCanvases);
 </script>
 
 </body>
