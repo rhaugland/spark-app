@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
-import { friends, interests, listeners } from "@/db/schema";
+import { listeners } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
 interface FeedItem {
@@ -10,7 +10,6 @@ interface FeedItem {
   time: string;
   category: string;
   listenerLabel: string;
-  friends: { id: string; name: string }[];
 }
 
 export async function GET() {
@@ -19,23 +18,14 @@ export async function GET() {
     .from(listeners)
     .where(eq(listeners.active, true));
 
-  const allFriends = await db.select().from(friends);
-  const allInterests = await db.select().from(interests);
-
-  const friendsMap = allFriends.map((f) => ({
-    ...f,
-    interests: allInterests.filter((i) => i.friendId === f.id),
-  }));
-
   const feedItems: FeedItem[] = [];
 
-  // Group listeners by source for batched fetching
   const espnListeners = activeListeners.filter((l) => l.source === "espn");
   const cryptoListeners = activeListeners.filter((l) => l.source === "coinpaprika");
   const culturalListeners = activeListeners.filter((l) => l.source === "cultural");
+  const customListeners = activeListeners.filter((l) => l.source === "custom");
 
   // ===== ESPN: Fetch scores =====
-  // Group by league to minimize API calls
   const leagueGroups = new Map<string, typeof espnListeners>();
   for (const l of espnListeners) {
     const config = l.config as { sport: string; league: string; teamId: string };
@@ -59,7 +49,6 @@ export async function GET() {
           const competitors = ev.competitions?.[0]?.competitors || [];
           const teamIds = competitors.map((c: { team: { id: string } }) => c.team.id);
 
-          // Check if any of our listened teams are in this game
           for (const listener of leagueListeners) {
             const config = listener.config as { teamId: string };
             if (!teamIds.includes(config.teamId)) continue;
@@ -74,9 +63,7 @@ export async function GET() {
             const homeName = home.team?.displayName || "Home";
             const awayName = away.team?.displayName || "Away";
 
-            let title: string;
-            let detail: string;
-            let time: string;
+            let title: string, detail: string, time: string;
 
             if (status === "Final") {
               const ourTeamHome = home.team.id === config.teamId;
@@ -97,25 +84,7 @@ export async function GET() {
               time = gameDate.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
             }
 
-            // Match to friends
-            const matched = friendsMap.filter((f) =>
-              f.interests.some(
-                (i) =>
-                  i.category === listener.category ||
-                  i.label.toLowerCase().includes(listener.label.toLowerCase()) ||
-                  listener.label.toLowerCase().includes(i.label.toLowerCase())
-              )
-            );
-
-            feedItems.push({
-              title,
-              detail,
-              type: "sports",
-              time,
-              category: listener.category,
-              listenerLabel: listener.label,
-              friends: matched.map((f) => ({ id: f.id, name: f.name })),
-            });
+            feedItems.push({ title, detail, type: "sports", time, category: listener.category, listenerLabel: listener.label });
           }
         }
       } catch {
@@ -139,27 +108,13 @@ export async function GET() {
       const direction = change24h >= 0 ? "up" : "down";
       const symbol = data.symbol || "";
 
-      const title = `${symbol} $${price >= 1 ? price.toLocaleString("en-US", { maximumFractionDigits: 0 }) : price.toFixed(4)}`;
-      const detail = `${direction === "up" ? "+" : ""}${change24h.toFixed(2)}% in 24h`;
-
-      const matched = friendsMap.filter((f) =>
-        f.interests.some(
-          (i) =>
-            i.category === "crypto" ||
-            i.label.toLowerCase().includes("crypto") ||
-            i.label.toLowerCase().includes(symbol.toLowerCase()) ||
-            i.label.toLowerCase().includes(data.name?.toLowerCase() || "")
-        )
-      );
-
       feedItems.push({
-        title,
-        detail,
+        title: `${symbol} $${price >= 1 ? price.toLocaleString("en-US", { maximumFractionDigits: 0 }) : price.toFixed(4)}`,
+        detail: `${direction === "up" ? "+" : ""}${change24h.toFixed(2)}% in 24h`,
         type: "market",
         time: "Live",
         category: "crypto",
         listenerLabel: listener.label,
-        friends: matched.map((f) => ({ id: f.id, name: f.name })),
       });
     } catch {
       // Skip failed coin
@@ -167,31 +122,15 @@ export async function GET() {
   });
 
   // ===== CULTURAL: Check calendar =====
+  const today = new Date();
   for (const listener of culturalListeners) {
     const config = listener.config as { events: { name: string; date: string; description: string }[] };
-    const today = new Date();
-    const todayMD = `${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
-
     for (const ev of config.events || []) {
       const evDate = new Date(`${today.getFullYear()}-${ev.date}T00:00:00`);
       const diff = Math.ceil((evDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
 
       if (diff >= -1 && diff <= 14) {
-        const timeLabel =
-          diff < 0 ? "Yesterday" :
-          diff === 0 ? "Today" :
-          diff === 1 ? "Tomorrow" :
-          `In ${diff} days`;
-
-        const matched = friendsMap.filter((f) =>
-          f.interests.some(
-            (i) =>
-              i.category === "cultural" ||
-              i.label.toLowerCase().includes(listener.label.toLowerCase().replace(" heritage", "")) ||
-              listener.label.toLowerCase().includes(i.label.toLowerCase())
-          )
-        );
-
+        const timeLabel = diff < 0 ? "Yesterday" : diff === 0 ? "Today" : diff === 1 ? "Tomorrow" : `In ${diff} days`;
         feedItems.push({
           title: ev.name,
           detail: ev.description,
@@ -199,30 +138,30 @@ export async function GET() {
           time: timeLabel,
           category: "cultural",
           listenerLabel: listener.label,
-          friends: matched.map((f) => ({ id: f.id, name: f.name })),
         });
       }
     }
   }
 
-  // ===== BIRTHDAYS from friends =====
-  for (const f of friendsMap) {
-    if (!f.birthday) continue;
-    const today = new Date();
-    const bday = new Date(f.birthday + "T00:00:00");
-    bday.setFullYear(today.getFullYear());
-    const diff = Math.ceil((bday.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-    if (diff >= 0 && diff <= 7) {
-      const label = diff === 0 ? "Today" : diff === 1 ? "Tomorrow" : `In ${diff} days`;
-      feedItems.push({
-        title: `${f.name}'s birthday is ${label.toLowerCase()}!`,
-        detail: diff === 0 ? "Send them something special" : "Get something ready",
-        type: "birthday",
-        time: label,
-        category: "birthday",
-        listenerLabel: "Birthdays",
-        friends: [{ id: f.id, name: f.name }],
-      });
+  // ===== CUSTOM: Check dates =====
+  for (const listener of customListeners) {
+    const config = listener.config as { events?: { name: string; date: string; description: string }[] };
+    for (const ev of config.events || []) {
+      if (!ev.date) continue;
+      const evDate = new Date(`${today.getFullYear()}-${ev.date}T00:00:00`);
+      const diff = Math.ceil((evDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+
+      if (diff >= -1 && diff <= 14) {
+        const timeLabel = diff < 0 ? "Yesterday" : diff === 0 ? "Today" : diff === 1 ? "Tomorrow" : `In ${diff} days`;
+        feedItems.push({
+          title: ev.name,
+          detail: ev.description,
+          type: diff === 0 ? "event" : "upcoming",
+          time: timeLabel,
+          category: "custom",
+          listenerLabel: listener.label,
+        });
+      }
     }
   }
 
@@ -230,7 +169,7 @@ export async function GET() {
 
   // Sort: live/today first, then by type priority
   const typePriority: Record<string, number> = {
-    birthday: 0, event: 1, sports: 2, market: 3, upcoming: 4,
+    event: 0, sports: 1, market: 2, upcoming: 3,
   };
   feedItems.sort((a, b) => {
     if (a.time === "LIVE" && b.time !== "LIVE") return -1;
