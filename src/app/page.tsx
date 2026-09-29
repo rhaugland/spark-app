@@ -3,36 +3,25 @@
 import { useState, useEffect, useCallback } from "react";
 
 // ===== TYPES =====
-interface Interest { id: string; label: string; category: string | null; }
-interface Friend { id: string; name: string; phone: string | null; birthday: string | null; interests: Interest[]; }
 interface Listener { id: string; source: string; sourceId: string; label: string; category: string; config: unknown; active: boolean; }
 interface CatalogItem { source: string; sourceId: string; label: string; category: string; group: string; fetchConfig: unknown; }
 interface Insight {
-  friendId: string; friendName: string; headline: string; context: string;
-  suggestedMessage: string; urgency: "now" | "today" | "soon" | "whenever";
+  headline: string; context: string; suggestedMessage: string;
+  urgency: "now" | "today" | "soon" | "whenever";
   eventTitle: string; category: string;
 }
 
-// ===== COMPONENT =====
 export default function Home() {
-  const [tab, setTab] = useState<"feed" | "friends" | "listeners">("feed");
+  const [tab, setTab] = useState<"feed" | "listeners">("feed");
   const [insights, setInsights] = useState<Insight[]>([]);
-  const [friends, setFriends] = useState<Friend[]>([]);
   const [listeners, setListeners] = useState<Listener[]>([]);
   const [catalog, setCatalog] = useState<CatalogItem[]>([]);
-  const [loading, setLoading] = useState(true);
   const [feedLoading, setFeedLoading] = useState(false);
   const [toast, setToast] = useState("");
 
-  // Editable messages per insight
+  // Editable messages
   const [editedMsgs, setEditedMsgs] = useState<Record<number, string>>({});
-
-  // Friends form
-  const [showAddFriend, setShowAddFriend] = useState(false);
-  const [editingFriend, setEditingFriend] = useState<Friend | null>(null);
-  const [fname, setFname] = useState("");
-  const [ftag, setFtag] = useState("");
-  const [ftags, setFtags] = useState<string[]>([]);
+  const [expandedCard, setExpandedCard] = useState<number | null>(null);
 
   // Listeners
   const [search, setSearch] = useState("");
@@ -45,10 +34,7 @@ export default function Home() {
 
   const showToast = useCallback((m: string) => { setToast(m); setTimeout(() => setToast(""), 2000); }, []);
 
-  // ===== DATA FETCHING =====
-  const fetchFriends = useCallback(async () => {
-    const r = await fetch("/api/friends"); setFriends(await r.json()); setLoading(false);
-  }, []);
+  // ===== FETCHING =====
   const fetchListeners = useCallback(async () => {
     const r = await fetch("/api/listeners"); setListeners(await r.json());
   }, []);
@@ -58,53 +44,16 @@ export default function Home() {
   const fetchInsights = useCallback(async () => {
     setFeedLoading(true);
     setEditedMsgs({});
+    setExpandedCard(null);
     try {
       const r = await fetch("/api/insights");
       setInsights(await r.json());
-    } catch {
-      setInsights([]);
-    }
+    } catch { setInsights([]); }
     setFeedLoading(false);
   }, []);
 
-  useEffect(() => { fetchFriends(); fetchListeners(); fetchCatalog(); }, [fetchFriends, fetchListeners, fetchCatalog]);
+  useEffect(() => { fetchListeners(); fetchCatalog(); }, [fetchListeners, fetchCatalog]);
   useEffect(() => { if (tab === "feed") fetchInsights(); }, [tab, fetchInsights]);
-
-  // ===== FRIEND ACTIONS =====
-  function openAddFriend() {
-    setFname(""); setFtag(""); setFtags([]); setEditingFriend(null); setShowAddFriend(true);
-  }
-  function openEditFriend(f: Friend) {
-    setFname(f.name); setFtag(""); setFtags(f.interests.map(i => i.label)); setEditingFriend(f); setShowAddFriend(true);
-  }
-  function addTag() {
-    const t = ftag.trim();
-    if (t && !ftags.includes(t)) { setFtags([...ftags, t]); setFtag(""); }
-  }
-  async function saveFriend() {
-    if (!fname.trim()) return;
-    const interestList = ftags.map(t => ({ label: t, category: null }));
-    if (editingFriend) {
-      await fetch(`/api/friends/${editingFriend.id}`, {
-        method: "PATCH", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: fname.trim(), interests: interestList }),
-      });
-      showToast("Updated!");
-    } else {
-      const r = await fetch("/api/friends", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: fname.trim(), interests: interestList }),
-      });
-      if (!r.ok) { const err = await r.json(); showToast(err.error || "Error"); return; }
-      showToast("Added!");
-    }
-    setShowAddFriend(false);
-    fetchFriends();
-  }
-  async function deleteFriend(id: string) {
-    await fetch(`/api/friends/${id}`, { method: "DELETE" });
-    fetchFriends(); showToast("Removed");
-  }
 
   // ===== LISTENER ACTIONS =====
   const isActive = (sourceId: string) => listeners.some(l => l.sourceId === sourceId && l.active);
@@ -140,7 +89,7 @@ export default function Home() {
       try { await navigator.share({ text }); return; } catch { /* cancelled */ }
     }
     await navigator.clipboard.writeText(text);
-    showToast("Copied to clipboard!");
+    showToast("Copied!");
   }
 
   // ===== CATALOG GROUPING =====
@@ -165,13 +114,11 @@ export default function Home() {
     soon: "bg-[#f59e0b]/20 text-[#f59e0b]",
     whenever: "bg-[#1f1f1f] text-[#666]",
   };
-
   const catColor: Record<string, string> = {
     nfl: "#ff6b35", nba: "#ef4444", mlb: "#22c55e", nhl: "#60a5fa",
     soccer: "#2ec4b6", crypto: "#a855f7", cultural: "#f59e0b", custom: "#2ec4b6",
   };
 
-  // ===== RENDER =====
   return (
     <div className="min-h-dvh flex flex-col bg-[#0a0a0a] text-white">
       {/* Header */}
@@ -180,33 +127,26 @@ export default function Home() {
         {tab === "feed" && (
           <button onClick={fetchInsights} className="text-[13px] font-semibold text-[#666] active:text-white transition-colors">Refresh</button>
         )}
-        {tab === "friends" && (
-          <button onClick={openAddFriend} className="text-[13px] font-semibold text-[#ff6b35] px-3 py-1.5 rounded-lg bg-[#ff6b35]/10 active:scale-95 transition-transform">+ Add</button>
-        )}
         {tab === "listeners" && (
           <button onClick={() => setShowCreate(true)} className="text-[13px] font-semibold text-[#ff6b35] px-3 py-1.5 rounded-lg bg-[#ff6b35]/10 active:scale-95 transition-transform">+ Custom</button>
         )}
       </div>
 
-      {/* Toast */}
       {toast && (
-        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-[100] bg-white text-black text-[13px] font-semibold px-4 py-2 rounded-full shadow-lg animate-[fadeIn_0.2s]">
-          {toast}
-        </div>
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-[100] bg-white text-black text-[13px] font-semibold px-4 py-2 rounded-full shadow-lg animate-[fadeIn_0.2s]">{toast}</div>
       )}
 
-      {/* Main content */}
+      {/* Main */}
       <div className="flex-1 pt-[72px] pb-[88px] overflow-y-auto">
         <div className="px-4 py-4 max-w-lg mx-auto">
 
-          {/* ===== FEED TAB ===== */}
+          {/* ===== FEED ===== */}
           {tab === "feed" && (
             <>
               {feedLoading && (
                 <div className="text-center py-16">
                   <div className="w-8 h-8 border-2 border-[#333] border-t-[#ff6b35] rounded-full animate-spin mx-auto mb-4" />
                   <div className="text-[14px] text-[#555] font-medium">Scanning your world...</div>
-                  <div className="text-[12px] text-[#444] mt-1">Matching events to your friends</div>
                 </div>
               )}
 
@@ -218,17 +158,10 @@ export default function Home() {
                     </svg>
                   </div>
                   <div className="text-[15px] text-[#555] font-medium">Your radar is quiet</div>
-                  <div className="text-[13px] text-[#444] mt-1 max-w-[260px] mx-auto">
-                    {friends.length === 0 ? "Add some friends to get started" :
-                     activeCount === 0 ? "Turn on some listeners to start scanning" :
-                     "No insights right now — check back soon"}
+                  <div className="text-[13px] text-[#444] mt-1">
+                    {activeCount === 0 ? "Turn on some listeners to start scanning" : "No insights right now — check back soon"}
                   </div>
-                  {friends.length === 0 && (
-                    <button onClick={() => setTab("friends")} className="mt-4 px-5 py-2 rounded-xl bg-[#1a1a1a] text-[#888] text-[13px] font-medium">
-                      Add Friends
-                    </button>
-                  )}
-                  {friends.length > 0 && activeCount === 0 && (
+                  {activeCount === 0 && (
                     <button onClick={() => setTab("listeners")} className="mt-4 px-5 py-2 rounded-xl bg-[#1a1a1a] text-[#888] text-[13px] font-medium">
                       Set Up Listeners
                     </button>
@@ -236,105 +169,62 @@ export default function Home() {
                 </div>
               )}
 
-              {!feedLoading && insights.map((insight, i) => (
-                <div key={i} className="mb-4 rounded-2xl bg-[#141414] border border-[#1f1f1f] overflow-hidden">
-                  {/* Accent bar */}
-                  <div className="h-1" style={{ background: catColor[insight.category] || "#2ec4b6" }} />
-
-                  <div className="p-4">
-                    {/* Top row: friend + urgency */}
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center gap-2.5">
-                        <div className="w-9 h-9 rounded-full flex items-center justify-center text-[13px] font-bold" style={{ background: `${catColor[insight.category] || "#2ec4b6"}20`, color: catColor[insight.category] || "#2ec4b6" }}>
-                          {insight.friendName.charAt(0).toUpperCase()}
-                        </div>
-                        <div>
-                          <div className="text-[13px] font-semibold text-white">For {insight.friendName}</div>
-                          <div className="text-[10px] text-[#555]">{insight.eventTitle}</div>
-                        </div>
-                      </div>
-                      <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${urgencyStyle[insight.urgency] || urgencyStyle.whenever}`}>
-                        {insight.urgency}
-                      </span>
-                    </div>
-
-                    {/* Insight */}
-                    <h3 className="text-[15px] font-semibold text-white mb-1 leading-snug">{insight.headline}</h3>
-                    <p className="text-[12px] text-[#777] mb-4 leading-relaxed">{insight.context}</p>
-
-                    {/* Editable message */}
-                    <div className="bg-[#0a0a0a] rounded-xl p-3 mb-3 border border-[#1a1a1a]">
-                      <div className="text-[9px] text-[#555] uppercase tracking-wider font-semibold mb-1.5">Suggested message</div>
-                      <textarea
-                        value={editedMsgs[i] ?? insight.suggestedMessage}
-                        onChange={e => setEditedMsgs(prev => ({ ...prev, [i]: e.target.value }))}
-                        rows={2}
-                        className="w-full text-[14px] text-white bg-transparent outline-none resize-none leading-relaxed"
-                      />
-                    </div>
-
-                    {/* Send */}
-                    <button onClick={() => sendMessage(editedMsgs[i] ?? insight.suggestedMessage)}
-                      className="w-full py-2.5 rounded-xl bg-gradient-to-r from-[#ff6b35] to-[#ff9f1c] text-white text-[13px] font-bold active:scale-[0.98] transition-transform">
-                      Send
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </>
-          )}
-
-          {/* ===== FRIENDS TAB ===== */}
-          {tab === "friends" && (
-            <>
-              <div className="mb-4 p-4 rounded-2xl bg-gradient-to-r from-[#ff6b35]/10 to-[#ff9f1c]/5 border border-[#ff6b35]/20">
-                <div className="text-[13px] text-[#999]">Friends</div>
-                <div className="text-[28px] font-bold text-white">{friends.length}<span className="text-[16px] text-[#555] font-normal"> / 15</span></div>
-              </div>
-
-              {loading && <div className="text-center py-8 text-[#555]">Loading...</div>}
-
-              {!loading && friends.length === 0 && (
-                <div className="text-center py-12">
-                  <div className="text-[15px] text-[#555] font-medium">No friends yet</div>
-                  <div className="text-[13px] text-[#444] mt-1">Add friends and tag what matters to them</div>
-                  <button onClick={openAddFriend} className="mt-4 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#ff6b35] to-[#ff9f1c] text-white text-[13px] font-bold">
-                    Add Your First Friend
-                  </button>
-                </div>
-              )}
-
-              {friends.map((f, fi) => (
-                <div key={f.id} className="mb-3 p-4 rounded-2xl bg-[#141414] border border-[#1f1f1f]">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#ff6b35]/20 to-[#ff9f1c]/10 flex items-center justify-center text-[15px] font-bold text-[#ff6b35]">
-                        {f.name.charAt(0).toUpperCase()}
-                      </div>
-                      <div className="text-[15px] font-semibold text-white">{f.name}</div>
-                    </div>
-                    <div className="flex gap-2">
-                      <button onClick={() => openEditFriend(f)} className="text-[12px] text-[#555] hover:text-white transition-colors">Edit</button>
-                      <button onClick={() => deleteFriend(f.id)} className="text-[12px] text-[#555] hover:text-red-400 transition-colors">Remove</button>
-                    </div>
-                  </div>
-                  {f.interests.length > 0 ? (
-                    <div className="flex flex-wrap gap-1.5">
-                      {f.interests.map((int, ii) => (
-                        <span key={int.id} className="px-2.5 py-1 rounded-full text-[11px] font-medium bg-[#1f1f1f] text-[#999]">
-                          {int.label}
+              {!feedLoading && insights.map((insight, i) => {
+                const expanded = expandedCard === i;
+                const accent = catColor[insight.category] || "#2ec4b6";
+                return (
+                  <div key={i} className="mb-4 rounded-2xl bg-[#141414] border border-[#1f1f1f] overflow-hidden">
+                    <div className="h-1" style={{ background: accent }} />
+                    <div className="p-4">
+                      {/* Header */}
+                      <div className="flex items-start justify-between mb-2">
+                        <span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: accent }}>{insight.category}</span>
+                        <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${urgencyStyle[insight.urgency] || urgencyStyle.whenever}`}>
+                          {insight.urgency}
                         </span>
-                      ))}
+                      </div>
+
+                      {/* Insight */}
+                      <h3 className="text-[16px] font-semibold text-white mb-1 leading-snug">{insight.headline}</h3>
+                      <p className="text-[13px] text-[#777] mb-3 leading-relaxed">{insight.context}</p>
+
+                      {/* Expand to send */}
+                      {!expanded ? (
+                        <button onClick={() => setExpandedCard(i)}
+                          className="w-full py-2.5 rounded-xl bg-gradient-to-r from-[#ff6b35] to-[#ff9f1c] text-white text-[13px] font-bold active:scale-[0.98] transition-transform">
+                          Send This
+                        </button>
+                      ) : (
+                        <div className="animate-[fadeIn_0.15s]">
+                          <div className="bg-[#0a0a0a] rounded-xl p-3 mb-3 border border-[#1a1a1a]">
+                            <div className="text-[9px] text-[#555] uppercase tracking-wider font-semibold mb-1.5">Edit message</div>
+                            <textarea
+                              value={editedMsgs[i] ?? insight.suggestedMessage}
+                              onChange={e => setEditedMsgs(prev => ({ ...prev, [i]: e.target.value }))}
+                              rows={3}
+                              className="w-full text-[14px] text-white bg-transparent outline-none resize-none leading-relaxed"
+                            />
+                          </div>
+                          <div className="flex gap-2">
+                            <button onClick={() => sendMessage(editedMsgs[i] ?? insight.suggestedMessage)}
+                              className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-[#ff6b35] to-[#ff9f1c] text-white text-[13px] font-bold active:scale-[0.98] transition-transform">
+                              Share
+                            </button>
+                            <button onClick={() => setExpandedCard(null)}
+                              className="py-2.5 px-4 rounded-xl bg-[#1a1a1a] text-[#666] text-[13px] font-medium">
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  ) : (
-                    <div className="text-[12px] text-[#444] italic">No interests tagged yet</div>
-                  )}
-                </div>
-              ))}
+                  </div>
+                );
+              })}
             </>
           )}
 
-          {/* ===== LISTENERS TAB ===== */}
+          {/* ===== LISTENERS ===== */}
           {tab === "listeners" && (
             <>
               <div className="mb-4 p-4 rounded-2xl bg-gradient-to-r from-[#ff6b35]/10 to-[#ff9f1c]/5 border border-[#ff6b35]/20">
@@ -394,60 +284,16 @@ export default function Home() {
               ))}
             </>
           )}
-
         </div>
       </div>
 
-      {/* ===== ADD/EDIT FRIEND MODAL ===== */}
-      {showAddFriend && (
-        <div className="fixed inset-0 z-[90] flex items-end justify-center bg-black/60 backdrop-blur-sm" onClick={() => setShowAddFriend(false)}>
-          <div className="w-full max-w-lg bg-[#141414] rounded-t-3xl p-6 border-t border-[#2a2a2a]" onClick={e => e.stopPropagation()} style={{ paddingBottom: "max(40px, env(safe-area-inset-bottom))" }}>
-            <div className="w-10 h-1 bg-[#333] rounded-full mx-auto mb-5" />
-            <h2 className="text-[18px] font-bold mb-4">{editingFriend ? "Edit Friend" : "Add Friend"}</h2>
-
-            <input type="text" placeholder="Name *" value={fname} onChange={e => setFname(e.target.value)}
-              className="w-full mb-3 p-3 rounded-xl bg-[#0a0a0a] border border-[#1f1f1f] text-[14px] text-white placeholder:text-[#555] outline-none focus:border-[#333]"
-            />
-
-            <div className="mb-3">
-              <div className="text-[12px] text-[#777] mb-2">What matters to them? (teams, hobbies, culture, etc.)</div>
-              <div className="flex gap-2">
-                <input type="text" placeholder="Add interest..." value={ftag}
-                  onChange={e => setFtag(e.target.value)}
-                  onKeyDown={e => { if (e.key === "Enter" || e.key === ",") { e.preventDefault(); addTag(); } }}
-                  className="flex-1 p-3 rounded-xl bg-[#0a0a0a] border border-[#1f1f1f] text-[14px] text-white placeholder:text-[#555] outline-none focus:border-[#333]"
-                />
-                <button onClick={addTag} className="px-4 py-3 rounded-xl bg-[#1f1f1f] text-white text-[13px] font-medium">Add</button>
-              </div>
-            </div>
-
-            {ftags.length > 0 && (
-              <div className="flex flex-wrap gap-1.5 mb-4">
-                {ftags.map((t, i) => (
-                  <span key={i} className="px-2.5 py-1 rounded-full text-[12px] font-medium bg-[#ff6b35]/15 text-[#ff6b35] flex items-center gap-1">
-                    {t}
-                    <button onClick={() => setFtags(ftags.filter((_, j) => j !== i))} className="text-[#ff6b35]/50 hover:text-[#ff6b35]">&times;</button>
-                  </span>
-                ))}
-              </div>
-            )}
-
-            <button onClick={saveFriend} disabled={!fname.trim()}
-              className="w-full py-3 rounded-xl bg-gradient-to-r from-[#ff6b35] to-[#ff9f1c] text-white text-[14px] font-bold disabled:opacity-40 active:scale-[0.98] transition-transform">
-              {editingFriend ? "Save Changes" : "Add Friend"}
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* ===== CREATE CUSTOM LISTENER MODAL ===== */}
+      {/* Create Custom Modal */}
       {showCreate && (
         <div className="fixed inset-0 z-[90] flex items-end justify-center bg-black/60 backdrop-blur-sm" onClick={() => setShowCreate(false)}>
           <div className="w-full max-w-lg bg-[#141414] rounded-t-3xl p-6 border-t border-[#2a2a2a]" onClick={e => e.stopPropagation()} style={{ paddingBottom: "max(40px, env(safe-area-inset-bottom))" }}>
             <div className="w-10 h-1 bg-[#333] rounded-full mx-auto mb-5" />
             <h2 className="text-[18px] font-bold mb-2">Create Custom Listener</h2>
             <p className="text-[13px] text-[#777] mb-4">Track any event — National Donut Day, a conference, an anniversary, anything.</p>
-
             <input type="text" placeholder="Event name *" value={cName} onChange={e => setCName(e.target.value)}
               className="w-full mb-3 p-3 rounded-xl bg-[#0a0a0a] border border-[#1f1f1f] text-[14px] text-white placeholder:text-[#555] outline-none focus:border-[#333]"
             />
@@ -476,18 +322,12 @@ export default function Home() {
         </div>
       )}
 
-      {/* ===== BOTTOM TABS ===== */}
+      {/* Bottom tabs */}
       <div className="fixed bottom-0 left-0 right-0 z-50 flex border-t border-[#1a1a1a] bg-[#0a0a0a]/90 backdrop-blur-xl" style={{ paddingBottom: "max(8px, env(safe-area-inset-bottom))" }}>
         {([
           { id: "feed" as const, label: "Feed", icon: (
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-              <path d="M2 12C2 6.48 6.48 2 12 2s10 4.48 10 10"/><path d="M2 12c0 5.52 4.48 10 10 10"/><path d="M12 2c2.5 3 4 6.5 4 10s-1.5 7-4 10"/>
-              <path d="M12 2c-2.5 3-4 6.5-4 10s1.5 7 4 10"/><line x1="2" y1="12" x2="22" y2="12"/>
-            </svg>
-          )},
-          { id: "friends" as const, label: "Friends", icon: (
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-              <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/>
+              <circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2c2.5 3 4 6.5 4 10s-1.5 7-4 10"/><path d="M12 2c-2.5 3-4 6.5-4 10s1.5 7 4 10"/>
             </svg>
           )},
           { id: "listeners" as const, label: "Listeners", icon: (
@@ -500,9 +340,6 @@ export default function Home() {
             className={`flex-1 flex flex-col items-center gap-1 py-2.5 transition-colors ${tab === t.id ? "text-[#ff6b35]" : "text-[#555]"}`}>
             {t.icon}
             <span className="text-[10px] font-semibold">{t.label}</span>
-            {t.id === "feed" && insights.length > 0 && tab !== "feed" && (
-              <div className="absolute -top-0.5 right-1/2 translate-x-4 w-2 h-2 bg-[#ff6b35] rounded-full" />
-            )}
           </button>
         ))}
       </div>
