@@ -5,18 +5,20 @@ import Anthropic from "@anthropic-ai/sdk";
 export interface Insight {
   headline: string;
   context: string;
+  talkingPoints: string[];
   suggestedMessage: string;
-  urgency: "now" | "today" | "soon" | "whenever";
+  date: string;
   eventTitle: string;
   category: string;
 }
 
 function buildFallbackInsights(events: RawEvent[]): Insight[] {
-  return events.slice(0, 15).map((ev) => ({
+  return events.slice(0, 12).map((ev) => ({
     headline: ev.title,
     context: ev.detail,
+    talkingPoints: [],
     suggestedMessage: `${ev.title} — ${ev.detail}`,
-    urgency: ev.time === "LIVE" ? "now" : ev.time === "Today" ? "today" : "soon",
+    date: ev.date,
     eventTitle: ev.title,
     category: ev.category,
   }));
@@ -39,34 +41,42 @@ export async function GET() {
   try {
     const response = await client.messages.create({
       model: "claude-sonnet-4-20250514",
-      max_tokens: 3000,
+      max_tokens: 4000,
       messages: [
         {
           role: "user",
-          content: `You are Spark, a social intelligence engine. You take raw event data and transform it into insights worth sharing with friends — things that make the sender look thoughtful, knowledgeable, and plugged in.
+          content: `You are Spark, a social intelligence engine. You don't just report events — you make people SMARTER about them. Your job is to give someone the depth to have a real conversation, not just drop a headline.
 
 RAW EVENTS:
 ${JSON.stringify(events)}
 
-YOUR JOB:
-- Turn each noteworthy event into a shareable insight
-- Skip routine/boring events. Focus on what's surprising, historic, emotional, or conversation-worthy
-- Your "headline" should be the insight — not just the score, but WHY it matters
-- Your "context" adds 1-2 sentences of background that makes the sender sound knowledgeable
-- Your "suggestedMessage" should be a casual, warm text message ready to send. Short (1-2 sentences). Sound like a real person, not a bot. No emojis.
-- Urgency: "now" for live/breaking, "today" for same-day, "soon" for upcoming, "whenever" for nice-to-know
+FOR EACH EVENT, generate:
 
-Return ONLY a JSON array (no markdown, no explanation). Each object:
-{
-  "headline": "string (the insight, max 15 words)",
-  "context": "string (1-2 sentences of background)",
-  "suggestedMessage": "string (casual text ready to send)",
-  "urgency": "now" | "today" | "soon" | "whenever",
-  "eventTitle": "string (original event title)",
-  "category": "string"
-}
+1. "headline" — The insight, not the score. Not "Vikings 23, Bucs 16" but "The Vikings are 4-0 for the first time since 2009." Tell me WHY this matters.
 
-Maximum 12 insights. Sort by urgency (now first). If nothing is worth sharing, return [].`,
+2. "context" — 2-3 sentences of real background. History, streaks, significance, what happened in the game that was interesting. Make me sound like I actually watched/followed this.
+
+3. "talkingPoints" — Array of 2-3 specific things I could bring up in conversation. These should be genuine conversation starters, not generic. Examples:
+   - For sports: key player performances, historical context, what this means for the season
+   - For cultural events: traditions people might not know, what people typically do, how to acknowledge it respectfully
+   - For crypto: what's driving the move, broader market context
+
+4. "suggestedMessage" — A casual text message ready to send. Sound like a real friend, not a bot. Short, warm, specific. No emojis.
+
+5. "date" — Use the exact date from the event data (the "date" field). Pass it through as-is.
+
+6. "eventTitle" — The original event title from the data.
+
+7. "category" — The original category from the data.
+
+RULES:
+- Skip boring/routine events. If a score isn't interesting, don't include it.
+- For cultural events, go DEEP. Don't just say "Festival of lights." Tell me what people actually do, what I should know, what makes it special.
+- For sports, focus on storylines, not just scores. Streaks, rivalries, breakout performances, playoff implications.
+- For crypto, explain the WHY behind the movement.
+- Maximum 12 insights. Sort by date (soonest first).
+
+Return ONLY a JSON array (no markdown, no explanation).`,
         },
       ],
     });

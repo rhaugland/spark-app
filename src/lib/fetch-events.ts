@@ -7,6 +7,7 @@ export interface RawEvent {
   detail: string;
   type: string;
   time: string;
+  date: string; // actual date like "Oct 3" or "Sep 29, 4:25 PM"
   category: string;
   listenerLabel: string;
 }
@@ -61,7 +62,7 @@ export async function fetchEvents(): Promise<RawEvent[]> {
             const homeName = home.team?.displayName || "Home";
             const awayName = away.team?.displayName || "Away";
 
-            let title: string, detail: string, time: string;
+            let title: string, detail: string, time: string, date: string;
 
             if (status === "Final") {
               const ourTeamHome = home.team.id === config.teamId;
@@ -71,18 +72,22 @@ export async function fetchEvents(): Promise<RawEvent[]> {
               title = `${awayName} ${awayScore} @ ${homeName} ${homeScore}`;
               detail = `${listener.label} ${won ? "WIN" : "LOSS"} - ${status}`;
               time = "Final";
+              const gd = new Date(ev.date);
+              date = gd.toLocaleDateString("en-US", { month: "short", day: "numeric" });
             } else if (status === "In Progress") {
               title = `LIVE: ${awayName} ${awayScore} @ ${homeName} ${homeScore}`;
               detail = ev.status?.type?.detail || "In Progress";
               time = "LIVE";
+              date = "Now";
             } else {
               const gameDate = new Date(ev.date);
               title = `${awayName} @ ${homeName}`;
               detail = `${status} - ${gameDate.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}`;
               time = gameDate.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+              date = gameDate.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
             }
 
-            feedItems.push({ title, detail, type: "sports", time, category: listener.category, listenerLabel: listener.label });
+            feedItems.push({ title, detail, type: "sports", time, date, category: listener.category, listenerLabel: listener.label });
           }
         }
       } catch {
@@ -110,6 +115,7 @@ export async function fetchEvents(): Promise<RawEvent[]> {
         detail: `${change24h >= 0 ? "+" : ""}${change24h.toFixed(2)}% in 24h`,
         type: "market",
         time: "Live",
+        date: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" }),
         category: "crypto",
         listenerLabel: listener.label,
       });
@@ -129,11 +135,13 @@ export async function fetchEvents(): Promise<RawEvent[]> {
 
       if (diff >= -1 && diff <= 14) {
         const timeLabel = diff < 0 ? "Yesterday" : diff === 0 ? "Today" : diff === 1 ? "Tomorrow" : `In ${diff} days`;
+        const dateLabel = evDate.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
         feedItems.push({
           title: ev.name,
           detail: ev.description,
           type: diff === 0 ? "event" : "upcoming",
           time: timeLabel,
+          date: dateLabel,
           category: listener.source === "custom" ? "custom" : "cultural",
           listenerLabel: listener.label,
         });

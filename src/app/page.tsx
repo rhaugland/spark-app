@@ -6,8 +6,8 @@ import { useState, useEffect, useCallback } from "react";
 interface Listener { id: string; source: string; sourceId: string; label: string; category: string; config: unknown; active: boolean; }
 interface CatalogItem { source: string; sourceId: string; label: string; category: string; group: string; fetchConfig: unknown; }
 interface Insight {
-  headline: string; context: string; suggestedMessage: string;
-  urgency: "now" | "today" | "soon" | "whenever";
+  headline: string; context: string; talkingPoints: string[];
+  suggestedMessage: string; date: string;
   eventTitle: string; category: string;
 }
 
@@ -108,12 +108,6 @@ export default function Home() {
   const activeCount = listeners.filter(l => l.active).length;
   const customListeners = listeners.filter(l => l.source === "custom");
 
-  const urgencyStyle: Record<string, string> = {
-    now: "bg-red-500/20 text-red-400",
-    today: "bg-[#ff6b35]/20 text-[#ff6b35]",
-    soon: "bg-[#f59e0b]/20 text-[#f59e0b]",
-    whenever: "bg-[#1f1f1f] text-[#666]",
-  };
   const catColor: Record<string, string> = {
     nfl: "#ff6b35", nba: "#ef4444", mlb: "#22c55e", nhl: "#60a5fa",
     soccer: "#2ec4b6", crypto: "#a855f7", cultural: "#f59e0b", custom: "#2ec4b6",
@@ -176,19 +170,29 @@ export default function Home() {
                   <div key={i} className="mb-4 rounded-2xl bg-[#141414] border border-[#1f1f1f] overflow-hidden">
                     <div className="h-1" style={{ background: accent }} />
                     <div className="p-4">
-                      {/* Header */}
+                      {/* Header: category + date */}
                       <div className="flex items-start justify-between mb-2">
                         <span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: accent }}>{insight.category}</span>
-                        <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${urgencyStyle[insight.urgency] || urgencyStyle.whenever}`}>
-                          {insight.urgency}
-                        </span>
+                        <span className="text-[11px] font-semibold text-[#888]">{insight.date}</span>
                       </div>
 
-                      {/* Insight */}
-                      <h3 className="text-[16px] font-semibold text-white mb-1 leading-snug">{insight.headline}</h3>
-                      <p className="text-[13px] text-[#777] mb-3 leading-relaxed">{insight.context}</p>
+                      {/* Headline */}
+                      <h3 className="text-[16px] font-semibold text-white mb-2 leading-snug">{insight.headline}</h3>
 
-                      {/* Expand to send */}
+                      {/* Context */}
+                      <p className="text-[13px] text-[#888] mb-3 leading-relaxed">{insight.context}</p>
+
+                      {/* Talking Points */}
+                      {insight.talkingPoints && insight.talkingPoints.length > 0 && (
+                        <div className="mb-3 pl-3 border-l-2 space-y-1.5" style={{ borderColor: `${accent}40` }}>
+                          <div className="text-[9px] text-[#555] uppercase tracking-wider font-semibold mb-1">Conversation starters</div>
+                          {insight.talkingPoints.map((tp, j) => (
+                            <p key={j} className="text-[12px] text-[#aaa] leading-relaxed">{tp}</p>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Send */}
                       {!expanded ? (
                         <button onClick={() => setExpandedCard(i)}
                           className="w-full py-2.5 rounded-xl bg-gradient-to-r from-[#ff6b35] to-[#ff9f1c] text-white text-[13px] font-bold active:scale-[0.98] transition-transform">
