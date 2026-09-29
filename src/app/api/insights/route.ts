@@ -40,7 +40,7 @@ export async function GET() {
 
   try {
     const response = await client.messages.create({
-      model: "claude-sonnet-4-20250514",
+      model: "claude-haiku-4-5-20251001",
       max_tokens: 4000,
       messages: [
         {
@@ -87,7 +87,8 @@ Return ONLY a JSON array (no markdown, no explanation).`,
     const insights: Insight[] = JSON.parse(cleaned);
 
     return NextResponse.json(insights);
-  } catch {
+  } catch (err) {
+    console.error("Insights AI error:", err);
     return NextResponse.json(buildFallbackInsights(events));
   }
 }
